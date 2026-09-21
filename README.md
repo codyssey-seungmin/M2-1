@@ -2,6 +2,7 @@
 
 > **감정을 기록에서 끝내지 않는 AI 감정 코치**
 > 코디세이 AI 네이티브 Final Project · 팀 3인
+> 주 대상: 감정을 정리할 공간이 필요한 20~50대 직장인·학생
 
 | | |
 |---|---|
@@ -146,7 +147,7 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 |---|---|---|---|
 | **김다빈** | 기획 / UX | 콘셉트, 모바일 UI, 접근성, 사용자 테스트 설계 | [`7689aba`](https://github.com/80gina/MM/commit/7689aba) · [`f164d49`](https://github.com/80gina/MM/commit/f164d49) · [`1148bb4`](https://github.com/80gina/MM/commit/1148bb4) |
 | **김진아** | 개발 | 모델 연동, FastAPI, Agent·RAG·생성형 AI·Memory, 배포 | [`4c58d82`](https://github.com/80gina/MM/commit/4c58d82) · [`6ea3d1c`](https://github.com/80gina/MM/commit/6ea3d1c) · [`b77aea5`](https://github.com/80gina/MM/commit/b77aea5) |
-| **이승민** | 검증 / 문서 | 기능명세, 테스트, 사용자 5명 피드백 수집·정리 | [`e547f92`](https://github.com/80gina/MM/commit/e547f92) · [`557d1b0`](https://github.com/80gina/MM/commit/557d1b0) · [`30d6917`](https://github.com/80gina/MM/commit/30d6917) |
+| **안승민** | 검증 / 문서 | 기능명세, 테스트, 사용자 5명 피드백 수집·정리 | [`e547f92`](https://github.com/80gina/MM/commit/e547f92) · [`557d1b0`](https://github.com/80gina/MM/commit/557d1b0) · [`30d6917`](https://github.com/80gina/MM/commit/30d6917) |
 
 ---
 
@@ -170,8 +171,8 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 
 ### 로컬 실행
 ```bash
-git clone https://github.com/80gina/MM.git
-cd MM
+git clone https://github.com/codyssey-seungmin/M2-1.git
+cd M2-1
 pip install -r requirements.txt
 export CODYSSEY_API_KEY=...                       # 생략 시 규칙 기반 문장으로 동작
 export CODYSSEY_API_BASE=https://.../v1           # 코디세이에서 받은 엔드포인트
