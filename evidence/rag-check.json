@@ -1,5 +1,5 @@
 {
-  "checked_on": "2026-09-19",
+  "checked_on": "2026-09-21",
   "scope": "local FastAPI retrieval and deterministic grounded answer; synthetic input",
   "input": {"emotion": "불안", "stress": 4, "minutes": 20},
   "search_endpoint": "/api/rag/search",
@@ -7,8 +7,9 @@
   "source_count_asserted": true,
   "https_sources_asserted": true,
   "generation": "deterministic_fallback",
-  "llm_adapter": "not_configured",
+  "fallback_reason": "not_configured",
+  "llm_enabled": false,
   "safety_assertion": "answer contains no diagnosis wording",
-  "agent_trace": ["analyze_emotion", "recommend_healing", "retrieve_grounding"],
-  "limits": ["No external LLM credential configured", "No real user responses"]
+  "verification": "test_rag.py passed with no key and with a synthetic key; the test disables LLM credentials for this fallback check",
+  "limits": ["No external LLM call in this check", "No real user responses"]
 }
