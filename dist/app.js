@@ -3,7 +3,7 @@ const navButtons = [...document.querySelectorAll('.bottom-nav [data-go]')];
 const backButton = document.querySelector('.back-button');
 const miniBrand = document.querySelector('.mini-brand');
 const screenTitle = document.querySelector('.screen-title');
-const titles = { home: '', diary: '감정 일기', analysis: 'AI 감정 분석', coach: '맞춤형 힐링 코치', chat: '마음 친구', records: '나의 마음 기록' };
+const titles = { home: '', diary: '감정 일기', analysis: 'AI 감정 분석', coach: '맞춤형 힐링 코치', chat: '마음 친구', records: '나의 마음 기록', rating: '앱 평가' };
 let currentScreen = 'home';
 let historyStack = ['home'];
 let selectedTags = [];
@@ -44,7 +44,8 @@ document.getElementById('quote-reset').addEventListener('click', () => {
 function showScreen(name, push = true) {
   if (!titles.hasOwnProperty(name)) return;
   screens.forEach((screen) => screen.classList.toggle('active', screen.dataset.screen === name));
-  navButtons.forEach((button) => button.classList.toggle('active', button.dataset.go === (name === 'analysis' || name === 'chat' ? (name === 'analysis' ? 'diary' : 'coach') : name)));
+  const navName = name === 'rating' ? currentScreen : (name === 'analysis' ? 'diary' : (name === 'chat' ? 'coach' : name));
+  navButtons.forEach((button) => button.classList.toggle('active', button.dataset.go === navName));
   currentScreen = name;
   if (push && historyStack.at(-1) !== name) historyStack.push(name);
   const isHome = name === 'home';
@@ -67,26 +68,83 @@ document.addEventListener('click', (event) => {
   if (event.target.closest('[data-start-breath]')) startBreathing();
 });
 
-document.getElementById('feedback-form').addEventListener('submit', async (event) => {
+const ratingForm = document.getElementById('app-rating-form');
+const ratingImprovement = document.getElementById('rating-improvement');
+const ratingClientKey = 'mindily-rating-client-id';
+const ratingSubmissionKey = 'mindily-rating-pending-submission-id';
+function getRatingClientId() {
+  let clientId = localStorage.getItem(ratingClientKey);
+  if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(clientId || '')) {
+    clientId = crypto.randomUUID();
+    localStorage.setItem(ratingClientKey, clientId);
+  }
+  return clientId;
+}
+function getRatingSubmissionId() {
+  let submissionId = localStorage.getItem(ratingSubmissionKey);
+  if (!/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(submissionId || '')) {
+    submissionId = crypto.randomUUID();
+    localStorage.setItem(ratingSubmissionKey, submissionId);
+  }
+  return submissionId;
+}
+function clearRatingSubmissionId() {
+  try { localStorage.removeItem(ratingSubmissionKey); } catch (_) {}
+}
+ratingImprovement.addEventListener('input', () => ratingImprovement.setCustomValidity(''));
+ratingForm.addEventListener('change', clearRatingSubmissionId);
+ratingForm.addEventListener('input', clearRatingSubmissionId);
+ratingForm.addEventListener('submit', async (event) => {
   event.preventDefault();
-  const satisfaction = document.querySelector('input[name="satisfaction"]:checked')?.value;
-  const consent = document.getElementById('feedback-consent').checked;
-  if (!satisfaction || !consent) { toast('만족도와 익명 제출 동의를 확인해주세요.'); return; }
-  const button = event.currentTarget.querySelector('[type="submit"]');
+  const improvement = ratingImprovement.value.trim();
+  if (!improvement) {
+    ratingImprovement.setCustomValidity('개선하면 좋을 점을 한 가지 적어주세요.');
+    ratingImprovement.reportValidity();
+    return;
+  }
+  const button = ratingForm.querySelector('[type="submit"]');
+  const status = document.getElementById('rating-status');
   if (button.disabled) return;
   button.disabled = true;
-  const payload = { card_id: 'session-exit', satisfaction: Number(satisfaction),
-    comment: document.getElementById('feedback-comment').value.trim() || null, consent: true };
+  button.textContent = '보내는 중...';
+  status.textContent = '구글 시트에 평가를 보내고 있어요.';
   try {
-    const response = await fetch('/api/feedback', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
-    if (!response.ok) throw new Error('feedback');
+    const payload = {
+      client_id: getRatingClientId(),
+      submission_id: getRatingSubmissionId(),
+      design: Number(ratingForm.elements['rating-design'].value),
+      emotion_helpfulness: Number(ratingForm.elements['rating-emotion'].value),
+      continued_use: Number(ratingForm.elements['rating-intent'].value),
+      improvement,
+      consent: document.getElementById('rating-consent').checked
+    };
+    const response = await fetch('/api/app-rating', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(payload) });
+    if (response.status === 503) throw new Error('not-configured');
+    if (response.status === 502 || response.status === 504) throw new Error('save-uncertain');
+    if (response.status === 422) throw new Error('invalid-rating');
+    if (!response.ok) throw new Error('send-failed');
     const result = await response.json();
-    if (!result.saved) throw new Error('not saved');
-    document.getElementById('feedback-dialog').close();
-    document.getElementById('feedback-form').reset();
-    toast('만족도를 저장했어요. 고마워요.');
-  } catch (error) { toast('저장하지 못했어요. 입력을 보관 중이니 다시 시도해주세요.'); }
-  finally { button.disabled = false; }
+    if (!result.saved) throw new Error('save-uncertain');
+    clearRatingSubmissionId();
+    ratingForm.reset();
+    status.textContent = /^U\d{2,}$/.test(result.participant_code || '')
+      ? `평가가 구글 시트에 ${result.participant_code} 코드로 저장됐어요. 고맙습니다.`
+      : '평가가 구글 시트에 저장됐어요. 고맙습니다.';
+    toast('평가를 저장했어요. 고맙습니다.');
+  } catch (error) {
+    status.textContent = error.message === 'not-configured'
+      ? '구글 시트 연결이 아직 준비되지 않았어요. 작성한 내용은 이 화면에 남아 있어요.'
+      : error.message === 'save-uncertain'
+        ? '제출 결과를 확인하지 못했어요. 같은 내용은 중복 저장되지 않으니 잠시 후 다시 시도해 주세요.'
+      : error.message === 'invalid-rating'
+        ? '입력 내용을 확인해 주세요. 작성한 내용은 이 화면에 남아 있어요.'
+      : error instanceof DOMException
+        ? '브라우저에 참여 코드를 저장할 수 없어요. 사이트 데이터 저장 설정을 확인해 주세요.'
+      : '제출 결과를 확인하지 못했어요. 같은 내용은 중복 저장되지 않으니 잠시 후 다시 시도해 주세요.';
+  } finally {
+    button.disabled = false;
+    button.textContent = '평가 보내기';
+  }
 });
 
 backButton.addEventListener('click', () => {
@@ -577,7 +635,6 @@ missionButton.addEventListener('click', () => {
       missionButton.textContent = '오늘의 미션 완료 ✓';
       missionButton.disabled = true;
       toast('잘했어요. 오늘 당신을 위해 잠시 시간을 내주었네요.');
-      document.getElementById('feedback-dialog').showModal();
     }
   }, 450);
 });

@@ -5,7 +5,7 @@
  *  - 캐시에는 화면 자원(HTML·CSS·JS·아이콘)만 담는다.
  *  - 버전을 올리면 이전 캐시는 즉시 삭제된다.
  */
-const VERSION = 'mindily-r20260920journeys3';
+const VERSION = 'mindily-r20260923rating5';
 const SHELL = [
   './',
   'index.html',
@@ -50,6 +50,20 @@ self.addEventListener('fetch', (event) => {
           return response;
         })
         .catch(() => caches.match('index.html').then((hit) => hit || caches.match('./')))
+    );
+    return;
+  }
+
+  // 화면 코드와 스타일은 서버 버전을 먼저 확인해 이전 문구가 오래 남지 않게 한다.
+  if (request.destination === 'script' || request.destination === 'style') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(VERSION).then((cache) => cache.put(request, copy)).catch(() => {});
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }

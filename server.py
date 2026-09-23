@@ -1,13 +1,16 @@
 """Mindily: 실제 감정 분류 API와 동일 출처의 UI 제공."""
 import os
+import re
 from pathlib import Path
 from contextlib import asynccontextmanager
 from threading import Lock
+from urllib.parse import urlparse
 
 ROOT = Path(__file__).resolve().parent
 os.environ.setdefault('HF_HOME', str(ROOT / 'models' / 'cache'))
 os.environ.setdefault('HF_HUB_DISABLE_TELEMETRY', '1')
 import torch
+import httpx
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
@@ -89,6 +92,23 @@ class Feedback(BaseModel):
     satisfaction: Optional[int] = Field(default=None, ge=1, le=5, strict=True)
     comment: Optional[str] = Field(default=None, max_length=300)
     consent: bool = False
+
+
+class AppRating(BaseModel):
+    client_id: str = Field(pattern=r'^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$')
+    submission_id: str = Field(pattern=r'^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$')
+    design: int = Field(ge=1, le=5, strict=True)
+    emotion_helpfulness: int = Field(ge=1, le=5, strict=True)
+    continued_use: int = Field(ge=1, le=5, strict=True)
+    improvement: str = Field(min_length=1, max_length=500)
+    consent: bool = False
+
+    @field_validator('improvement')
+    @classmethod
+    def nonblank_improvement(cls, value):
+        if not value.strip():
+            raise ValueError('개선하면 좋을 점을 한 가지 적어주세요.')
+        return value.strip()
 
 
 class OrganizerDraftRequest(BaseModel):
@@ -235,6 +255,42 @@ def save_user_feedback(feedback: Feedback):
     receipt = save_feedback(feedback.card_id, helpful, feedback.satisfaction, feedback.comment)
     return {'tool': 'save_user_feedback', 'saved': True,
             'receipt': receipt, 'message': '의견을 저장했어요.'}
+
+
+@app.post('/api/app-rating')
+def save_app_rating(rating: AppRating):
+    """Let the sheet assign a stable participant code to this browser."""
+    if not rating.consent:
+        raise HTTPException(422, '구글 시트 저장 동의가 필요해요.')
+
+    webhook_url = os.getenv('MINDILY_SURVEY_WEBHOOK_URL', '').strip()
+    parsed = urlparse(webhook_url)
+    if parsed.scheme != 'https' or parsed.hostname != 'script.google.com' or not parsed.path.startswith('/macros/s/') or not parsed.path.endswith('/exec'):
+        raise HTTPException(503, '구글 시트 연결이 아직 준비되지 않았어요.')
+
+    payload = {
+        'client_id': rating.client_id,
+        'submission_id': rating.submission_id,
+        'design': rating.design,
+        'emotion_helpfulness': rating.emotion_helpfulness,
+        'continued_use': rating.continued_use,
+        'improvement': rating.improvement,
+    }
+    try:
+        with httpx.Client(timeout=15, follow_redirects=True) as client:
+            response = client.post(webhook_url, json=payload)
+            response.raise_for_status()
+            result = response.json()
+    except (httpx.HTTPError, ValueError) as exc:
+        raise HTTPException(502, '구글 시트의 저장 응답을 확인하지 못했어요.') from exc
+
+    if not isinstance(result, dict) or result.get('saved') is not True:
+        raise HTTPException(502, '구글 시트에서 저장 완료를 확인하지 못했어요.')
+    participant_code = str(result.get('participant_code', ''))
+    return {
+        'saved': True,
+        'participant_code': participant_code if re.fullmatch(r'U\d{2,}', participant_code) else None,
+    }
 
 
 @app.middleware('http')

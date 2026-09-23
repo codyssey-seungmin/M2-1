@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=r20260920journeys3">
+  <link rel="stylesheet" href="styles.css?v=r20260922rating3">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -78,7 +78,6 @@
           <div class="progress-track" aria-label="미션 진행률"><span id="mission-progress"></span></div>
           <button class="secondary-button" type="button" id="mission-button">미션 시작하기</button>
         </div>
-        <button class="text-button session-end-button" type="button" data-open-dialog="feedback-dialog">오늘 사용을 마쳤어요 · 만족도 남기기</button>
       </section>
 
       <section class="screen" data-screen="diary" aria-labelledby="diary-heading">
@@ -175,7 +174,7 @@
           <button class="text-button" type="button" id="delete-memory">저장된 선호 삭제</button>
           <p id="memory-status" role="status">저장된 선호가 없어요.</p>
         </div>
-        <button class="text-button session-end-button" type="button" data-open-dialog="feedback-dialog">오늘 사용을 마쳤어요 · 만족도 남기기</button>
+        <button class="app-rating-button" type="button" data-go="rating"><span aria-hidden="true">🤗</span>앱 평가 부탁드려요</button>
         <p class="gentle-note">지금은 충분히 쉬어도 괜찮아요.<br>작은 휴식이 내일의 여유가 되어줄 거예요. ♡</p>
       </section>
 
@@ -213,6 +212,56 @@
         </section>
         <div class="card recent-entry"><div class="section-heading"><h3>최근 기록</h3><span id="record-date">오늘</span></div><div class="entry-title"><span id="record-emoji">😮‍💨</span><strong id="record-mood">걱정되는</strong><span class="soft-chip" id="record-stress">스트레스 3/5</span></div><p id="record-copy">오늘의 마음을 기록하면 여기에 일기와 AI가 정리한 감정이 남아요.</p></div>
         <button class="text-button" type="button" id="delete-records">이 브라우저의 모든 일기 기록 삭제</button>
+      </section>
+
+      <section class="screen rating-screen" data-screen="rating" aria-labelledby="rating-heading">
+        <div class="rating-intro">
+          <h2 id="rating-heading">Mindily는 어떠셨나요?</h2>
+          <p>첫 평가 때 참여 코드가 자동으로 발급돼요. 같은 브라우저에서 다시 평가하면 같은 코드로 기록됩니다.</p>
+        </div>
+        <form id="app-rating-form">
+          <fieldset class="card rating-question">
+            <legend>디자인이 어떠신가요?</legend>
+            <div class="rating-options">
+              <label><input type="radio" name="rating-design" value="1" required><span>1</span></label>
+              <label><input type="radio" name="rating-design" value="2"><span>2</span></label>
+              <label><input type="radio" name="rating-design" value="3"><span>3</span></label>
+              <label><input type="radio" name="rating-design" value="4"><span>4</span></label>
+              <label><input type="radio" name="rating-design" value="5"><span>5</span></label>
+            </div>
+            <div class="rating-ends"><span>마음에 들지 않아요</span><span>매우 마음에 들어요</span></div>
+          </fieldset>
+          <fieldset class="card rating-question">
+            <legend>감정을 돌아보고 조절하는 데 도움이 되었나요?</legend>
+            <div class="rating-options">
+              <label><input type="radio" name="rating-emotion" value="1" required><span>1</span></label>
+              <label><input type="radio" name="rating-emotion" value="2"><span>2</span></label>
+              <label><input type="radio" name="rating-emotion" value="3"><span>3</span></label>
+              <label><input type="radio" name="rating-emotion" value="4"><span>4</span></label>
+              <label><input type="radio" name="rating-emotion" value="5"><span>5</span></label>
+            </div>
+            <div class="rating-ends"><span>전혀 도움이 안 됐어요</span><span>매우 도움이 됐어요</span></div>
+          </fieldset>
+          <fieldset class="card rating-question">
+            <legend>이 앱을 계속 사용하실 의향이 있으신가요?</legend>
+            <div class="rating-options">
+              <label><input type="radio" name="rating-intent" value="1" required><span>1</span></label>
+              <label><input type="radio" name="rating-intent" value="2"><span>2</span></label>
+              <label><input type="radio" name="rating-intent" value="3"><span>3</span></label>
+              <label><input type="radio" name="rating-intent" value="4"><span>4</span></label>
+              <label><input type="radio" name="rating-intent" value="5"><span>5</span></label>
+            </div>
+            <div class="rating-ends"><span>사용할 생각이 없어요</span><span>계속 사용하고 싶어요</span></div>
+          </fieldset>
+          <div class="card rating-comment">
+            <label for="rating-improvement">개선했으면 하는 점을 하나 꼭 적어주세요.<span class="rating-required">필수</span></label>
+            <textarea id="rating-improvement" name="improvement" required maxlength="500" placeholder="예: 글씨를 조금 더 크게 보여주세요."></textarea>
+            <small>개인 정보나 민감한 내용은 적지 말아주세요.</small>
+          </div>
+          <label class="rating-consent"><input type="checkbox" id="rating-consent" required> 자동 발급된 참여 코드와 평가·의견을 구글 시트에 저장하는 데 동의합니다. 일기 기록을 삭제해도 제출한 평가는 남습니다.</label>
+          <p id="rating-status" class="rating-status" role="status" aria-live="polite"></p>
+          <button class="primary-button rating-submit" type="submit">평가 보내기</button>
+        </form>
       </section>
 
       <nav class="bottom-nav" aria-label="주요 메뉴">
@@ -298,22 +347,8 @@
     <form method="dialog"><button class="icon-button" value="cancel" aria-label="닫기">×</button><span class="eyebrow">안전한 사용 안내</span><h2>Mindily는 마음을 정리하는 도구예요.</h2><p>감정 분석은 의료적 진단이 아니며, 중요한 판단을 대신하지 않아요. 스스로 또는 타인을 해칠 위험이 있거나 즉각적인 도움이 필요하면 지역 응급기관과 전문 상담기관에 연락해주세요.</p><button class="secondary-button" value="ok">확인했어요</button></form>
   </dialog>
 
-  <dialog id="feedback-dialog" class="sheet-dialog">
-    <form method="dialog" class="sheet-content" id="feedback-form">
-      <div class="sheet-handle" aria-hidden="true"></div>
-      <div class="section-heading"><div><span class="eyebrow">사용 후 한마디</span><h2>오늘 Mindily는 어땠나요?</h2></div><button class="icon-button" type="button" data-close-dialog="feedback-dialog" aria-label="닫기">×</button></div>
-      <p>서버에는 일기 원문을 보내지 않아요. 만족도와 선택한 의견은 익명으로 저장하며, 민감한 내용은 의견란에 적지 말아주세요.</p>
-      <fieldset class="form-block"><legend>사용 경험은 어땠나요?</legend><div class="stress-scale feedback-scale" role="radiogroup" aria-label="만족도">
-        <label><input type="radio" name="satisfaction" value="1" required><span>1</span></label><label><input type="radio" name="satisfaction" value="2"><span>2</span></label><label><input type="radio" name="satisfaction" value="3"><span>3</span></label><label><input type="radio" name="satisfaction" value="4"><span>4</span></label><label><input type="radio" name="satisfaction" value="5"><span>5</span></label>
-      </div></fieldset>
-      <label class="journal-field"><span>한마디 (선택)</span><textarea id="feedback-comment" maxlength="300" placeholder="가장 도움이 된 점이나 불편했던 점을 적어주세요."></textarea></label>
-      <label class="privacy-inline"><input type="checkbox" id="feedback-consent"> 익명 만족도 조사에 동의하고 제출합니다.</label>
-      <button class="primary-button" value="confirm" type="submit">만족도 제출하기</button>
-    </form>
-  </dialog>
-
   <div class="toast" role="status" aria-live="polite" id="toast"></div>
   <script src="event_groups.js?v=r20260920journeys3"></script>
-  <script src="app.js?v=r20260920journeys3"></script>
+  <script src="app.js?v=r20260923rating5"></script>
 </body>
 </html>
