@@ -14,7 +14,7 @@
 | ② 프론트엔드 | `dist/index.html`, `app.js`, `styles.css`, `manifest.webmanifest`, `sw.js`, localStorage | 화면 렌더링, API 호출, **일기 원문 기기 보관**, 수정 가능한 개인 문구·정리 초안·사건 요약 저장, 기록 그래프·보고서 계산, 자연의 소리 합성 |
 | ③ API | `server.py` (FastAPI + Uvicorn) | 요청 검증, 라우팅, 상태 공개 |
 | ④ Agent | `coach_agent.py` | 의도 판별 후 도구를 순서대로 호출 |
-| ⑤ 모델·지식·저장 | KcELECTRA, `llm.py`, `diary_draft.py`, `rag.py`, `healing_knowledge.py`, `memory_db.py`, `feedback_db.py` | 분류 추론, 출처 접지 코칭, 동의 기반 일기 초안·사건 요약 생성, 선호·피드백 저장 |
+| ⑤ 모델·지식·저장 | KcELECTRA, `llm.py`, `diary_draft.py`, `rag.py`, `healing_knowledge.py`, `memory_db.py`, Google Apps Script·Google Sheets | 분류 추론, 출처 접지 코칭, 동의 기반 일기 초안·사건 요약 생성, 선호 기억·앱 평가 저장 |
 | ⑥ 배포 | Dockerfile → Hugging Face Spaces, GitHub `main` | 영구 HTTPS URL 제공, 이력 관리 |
 
 ---
@@ -57,7 +57,8 @@ generate_coach_message ┼─ 호출 실패  → deterministic_fallback (call_fa
 ```
 [동의 O] 선호 활동 → POST /api/memory → SQLite 저장 (30일 만료)
 [동의 X] 저장하지 않음 — 기능은 그대로 사용 가능
-종료 설문 만족도 1~5 → save_user_feedback → 익명 집계 SQLite
+앱 평가 3항목·개선 의견 → POST /api/app-rating → Google Apps Script → Google Sheets
+브라우저별 참여 코드 → 반복 평가 묶음 / 제출별 ID → 재전송 중복 방지
 다음 방문 → POST /api/memory/read → 30일 이내 선호만 추천 가중치에 반영
 ```
 
@@ -94,6 +95,7 @@ generate_coach_message ┼─ 호출 실패  → deterministic_fallback (call_fa
 | 자연의 소리를 **브라우저에서 합성** | 음원 파일 동봉 | 저작권 문제와 이미지 용량 증가를 동시에 없앤다 (Web Audio API) |
 | **설치형 웹앱(PWA)** | 네이티브 앱 등록 | 등록비·심사 없이 홈 화면 설치. 화면 자원만 캐시하고 `/api/*`는 캐시하지 않는다 |
 | **Hugging Face Spaces** 배포 | Render 유료 플랜 | 무료 등급으로 영구 HTTPS URL, 모델을 이미지에 동봉해 콜드스타트 제거 |
+| 앱 평가를 **Google Sheets**에 저장 | Space 내부 SQLite | 배포 재시작과 분리해 응답을 유지하고 팀이 바로 집계 |
 
 ---
 
@@ -107,7 +109,7 @@ generate_coach_message ┼─ 호출 실패  → deterministic_fallback (call_fa
 | 개인 문구·정리 내용·사건 요약 | 브라우저 localStorage | 사용자 삭제 시까지 | 브라우저 저장에 별도 동의 불필요 | 저장 후 외부 전송 없음 |
 | 확정 감정·스트레스 | 브라우저 localStorage | 동일 | 불필요 | 없음 |
 | 선호 활동 | 서버 SQLite | 30일 자동 정리 | **필수** | 없음 |
-| 만족도·의견 | 서버 SQLite (익명) | 과제 종료 시 파기 | **필수** | 없음 |
+| 앱 평가·개선 의견·참여 코드·제출 ID | Google Sheets | 과제 평가·분석 종료 후 정리 | **필수** | Google Apps Script 웹 앱 |
 
 일반 코치 생성형 AI에 전달되는 것은 **감정 라벨 · 스트레스 숫자 · 출처 카드 3장**뿐이며, 이는 `test_llm.py`의 `prompt_excludes_diary_text` 검사로 확인합니다. 초안 API는 별도 동의가 있어야만 일기 원문을 사용합니다.
 Agent 실행 추적에도 **도구 이름만** 기록합니다.
@@ -122,9 +124,9 @@ Agent 실행 추적에도 **도구 이름만** 기록합니다.
 | 포트 | 7860 (`app_port`) |
 | 하드웨어 | CPU basic (무료) |
 | 모델 캐시 | **빌드 시 이미지에 동봉** — 첫 요청 콜드스타트 제거 |
-| 비밀값 | `CODYSSEY_API_KEY` (Space Secrets) + `CODYSSEY_API_BASE` · `CODYSSEY_MODEL` |
+| 비밀값 | Space Secrets: `CODYSSEY_API_KEY`, `MINDILY_SURVEY_WEBHOOK_URL` · Variables: `CODYSSEY_API_BASE`, `CODYSSEY_MODEL` |
 | 상태 확인 | `GET /api/health`, `GET /api/llm/status` |
-| 제약 | 무료 등급은 영구 디스크 없음 → 재시작 시 SQLite 초기화 |
+| 제약 | 무료 등급은 영구 디스크 없음 → SQLite 선호 기억은 초기화될 수 있음. Google Sheets 평가는 유지 |
 
 ---
 
@@ -137,7 +139,8 @@ Agent 실행 추적에도 **도구 이름만** 기록합니다.
 | ⑤ RAG | `test_rag.py`, `evidence/rag-check.json` |
 | ⑤ **생성형 AI** | `test_llm.py`, `evidence/llm-check.json` |
 | ⑤ Memory | `test_memory_restart.py`, `evidence/memory-retention-check.json` |
-| ⑤ Feedback | `test_feedback.py` |
+| ⑤ 기존 Feedback API | `test_feedback.py` |
+| ⑤ Google Sheets 앱 평가 | `docs/GOOGLE_SHEETS_SURVEY.md`, `docs/google_sheets_receiver.gs` |
 | ⑥ 패키징 | `test_packaging.py` |
 
 ---
@@ -157,11 +160,11 @@ flowchart TD
     AG --> T2["retrieve_grounding"]
     AG --> T3["generate_coach_message<br/>생성형 AI"]
     AG --> T4["recommend_healing"]
-    API --> T5["save_user_feedback"]
+    API --> T5["POST /api/app-rating"]
     T1 --> M[("KcELECTRA<br/>감정 분류")]
     T2 --> R[("RAG 지식베이스<br/>출처·라이선스")]
     T3 --> R
     T3 --> G[("코디세이 생성형 API<br/>출처 안에서만 생성")]
     T4 --> MEM[("Long-term Memory<br/>동의·30일")]
-    T5 --> FB[("피드백 SQLite<br/>익명 집계")]
+    T5 --> FB[("Google Apps Script<br/>Google Sheets 앱 평가")]
 ```

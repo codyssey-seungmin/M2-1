@@ -22,10 +22,11 @@
         → 출처 접지 코치 문장(생성형 AI) + 명언·꽃·향
         → 활동을 앱 안에서 바로 실행 (자연의 소리는 브라우저가 합성)
         → 기록 누적 → 주·월·연 흐름과 감정 분석 보고서
-        → 만족도 → (동의 시) 30일 선호 기억
+        → 앱 평가 3항목·개선 의견 → Google Sheets 익명 수집
+        → (동의 시) 선호 활동 30일 기억
 ```
 
-**화면 넷**
+**주요 화면**
 
 | 화면 | 하는 일 |
 |---|---|
@@ -33,6 +34,7 @@
 | AI 감정 분석 | 6개 감정 레이더 · 저작권 만료 인용구 · 추천 꽃과 향 · 무드 미터 |
 | 맞춤형 힐링 코치 | 활동을 골라 **앱 안에서** 5단계 안내대로 실행. 빗소리·바람·파도 재생 |
 | 마음 기록 | 주간·월간·연간 스트레스 흐름과 감정 분석 보고서 (텍스트로 저장) |
+| 앱 평가 | 디자인·감정 도움·계속 사용할 의향을 1~5점으로 평가하고 필수 개선 의견 제출 |
 
 사용자는 홈·데스크톱 안내 문구를 직접 바꿀 수 있습니다. 감정 정리 화면에서는 최신 일기의 사건·마음 초안을 만들고 수정할 수 있으며, ‘지금 무엇이 필요할까요?’ 아래의 예시 5개를 선택해 입력할 수 있습니다. 마음 기록에서는 주간·월간·연간을 고른 뒤 주요 사건 팝업에서 같은 사건으로 보이는 기록을 한 카드에 묶어 `1. 개요 → 2. 사연별 요약 분석(주요 원인·주된 감정·핵심 내용) → 3. 종합정리` 보고서 형식으로 확인합니다. 예를 들어 “친구와 싸움: 10월 1일 의견 차이로 화남 → 10월 2일 대화 후 안도”처럼 표시됩니다. 사건 제목·경과를 수정하거나 잘못 묶인 기록을 분리하고, 목록을 브라우저에 저장·삭제할 수 있습니다. 저장한 목록은 보고서 텍스트 파일에도 포함됩니다.
 
@@ -125,6 +127,26 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 
 ---
 
+## 사용자 평가 수집
+
+AI 코치 화면의 **🤗 앱 평가 부탁드려요** 버튼에서 다음 내용을 받습니다.
+
+| 항목 | 방식 |
+|---|---|
+| 디자인 | 1~5점 |
+| 감정을 돌아보고 조절하는 데 도움 | 1~5점 |
+| 계속 사용할 의향 | 1~5점 |
+| 개선 의견 | 500자 이내 필수 입력 |
+
+평가에 동의하면 FastAPI의 `POST /api/app-rating`이 Google Apps Script 웹 앱으로 전달하고, 연결된 Google Sheets의 `앱 평가` 탭에 기록합니다. 이름·이메일·일기 원문·AI API 키는 평가 데이터에 포함하지 않습니다.
+
+- **참여 코드**(`U01`, `U02` …): 같은 브라우저의 반복 평가를 묶기 위한 가명 코드입니다. 기기나 브라우저가 달라지거나 사이트 데이터를 삭제하면 새 코드가 발급될 수 있습니다.
+- **제출 ID**: 네트워크 재시도로 같은 평가가 두 번 저장되는 것을 막기 위한 평가 건별 무작위 값입니다.
+- 앱에서 일기 기록을 삭제해도 이미 제출한 평가는 Google Sheets에 남습니다.
+- 설문 설정과 운영 절차는 [Google Sheets 평가 수집 안내](docs/GOOGLE_SHEETS_SURVEY.md)에 있습니다.
+
+---
+
 ## 개인정보 처리
 
 | 데이터 | 저장 위치 | 보존 | 동의 | 외부 전송 |
@@ -133,7 +155,7 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 | 기록 그래프·보고서 | 브라우저 localStorage | 최근 400건 | 사건 초안 생성은 별도 동의 | 수치·그래프는 기기 안에서 계산. 선택 기간의 일기를 10건씩 나누어 초안을 요청하며, 서버에 저장하지 않음 |
 | 개인 문구·수정한 초안 | 브라우저 localStorage | 사용자 삭제 시까지 | 불필요 | 저장 후 외부 전송 없음 |
 | 선호 활동 | 서버 SQLite | 30일 자동 삭제 | **필수** | 없음 |
-| 만족도·의견 | 서버 SQLite (익명) | 과제 종료 시 파기 | **필수** | 없음 |
+| 앱 평가·개선 의견·참여 코드·제출 ID | Google Sheets | 과제 평가·분석 종료 후 정리 | **필수** | Google Apps Script 웹 앱 |
 
 - AI가 생성·추천한 콘텐츠임을 화면에 표시합니다.
 - 동의를 거부해도 핵심 기능을 그대로 사용할 수 있습니다.
@@ -147,7 +169,7 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 |---|---|---|---|
 | **김다빈** | 기획 / UX | 콘셉트, 모바일 UI, 접근성, 사용자 테스트 설계 | [`7689aba`](https://github.com/80gina/MM/commit/7689aba) · [`f164d49`](https://github.com/80gina/MM/commit/f164d49) · [`1148bb4`](https://github.com/80gina/MM/commit/1148bb4) |
 | **김진아** | 개발 | 모델 연동, FastAPI, Agent·RAG·생성형 AI·Memory, 배포 | [`4c58d82`](https://github.com/80gina/MM/commit/4c58d82) · [`6ea3d1c`](https://github.com/80gina/MM/commit/6ea3d1c) · [`b77aea5`](https://github.com/80gina/MM/commit/b77aea5) |
-| **안승민** | 검증 / 문서 | 기능명세, 테스트, 사용자 5명 피드백 수집·정리 | [`e547f92`](https://github.com/80gina/MM/commit/e547f92) · [`557d1b0`](https://github.com/80gina/MM/commit/557d1b0) · [`30d6917`](https://github.com/80gina/MM/commit/30d6917) |
+| **안승민** | 검증 / 문서 | 기능명세, 테스트, Google Sheets 사용자 평가 수집·운영 문서 | [`e547f92`](https://github.com/80gina/MM/commit/e547f92) · [`272f13f`](https://github.com/codyssey-seungmin/M2-1/commit/272f13f) |
 
 ---
 
@@ -160,7 +182,7 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 | 백엔드 | FastAPI · Uvicorn · PyTorch (CPU) |
 | 프론트엔드 | HTML · CSS · JavaScript (빌드 체인 없음) |
 | 앱 형태 | 설치형 웹앱(PWA) — manifest + 서비스 워커, 홈 화면 설치·오프라인 화면 |
-| 저장 | 브라우저 localStorage + SQLite |
+| 저장 | 브라우저 localStorage + SQLite(30일 선호 기억) + Google Sheets(동의한 앱 평가) |
 | 배포 | Docker → Hugging Face Spaces (`yellowmug/mindily`) |
 
 선정 이유는 [기획서 5장](docs/기획서.md)에 정리했습니다.
@@ -169,17 +191,24 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 
 ## 실행 방법
 
-### 로컬 실행
-```bash
+### 로컬 실행 (Windows PowerShell)
+```powershell
 git clone https://github.com/codyssey-seungmin/M2-1.git
 cd M2-1
-pip install -r requirements.txt
-export CODYSSEY_API_KEY=...                       # 생략 시 규칙 기반 문장으로 동작
-export CODYSSEY_API_BASE=https://.../v1           # 코디세이에서 받은 엔드포인트
-export CODYSSEY_MODEL=gpt-4o-mini                 # 코디세이에서 지정한 모델명
-python -m uvicorn server:app --host 127.0.0.1 --port 8010
-# http://127.0.0.1:8010
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+
+# 아래 값은 현재 PowerShell 창에만 설정됩니다. 실제 값은 Git에 올리지 않습니다.
+$env:CODYSSEY_API_KEY='발급받은_API_키'            # 생략하면 규칙 기반 문장으로 동작
+$env:CODYSSEY_API_BASE='https://.../v1'
+$env:CODYSSEY_MODEL='발급처에서_지정한_모델명'
+$env:MINDILY_SURVEY_WEBHOOK_URL='https://script.google.com/macros/s/.../exec'
+
+.\.venv\Scripts\python.exe -m uvicorn server:app --reload
+# http://127.0.0.1:8000
 ```
+
+`.env`, API 키, Apps Script 웹 앱 URL은 커밋하지 않습니다. 평가 수집을 사용하지 않으면 `MINDILY_SURVEY_WEBHOOK_URL`을 생략할 수 있으며, 나머지 앱 기능은 그대로 실행됩니다.
 
 ### Hugging Face Space 배포
 
@@ -191,7 +220,7 @@ push_to_huggingface.cmd
 
 로그인은 계정 비밀번호가 아니라 Hugging Face **쓰기(write) 토큰**을 씁니다.
 macOS·Linux에서는 `./deploy_space.sh yellowmug` 를 쓸 수 있습니다.
-Space Settings → *Variables and secrets* 에 `CODYSSEY_API_KEY`(Secret), `CODYSSEY_API_BASE`, `CODYSSEY_MODEL`을 등록합니다.
+Space Settings → *Variables and secrets* 에 `CODYSSEY_API_KEY`와 `MINDILY_SURVEY_WEBHOOK_URL`을 **Secret**으로, `CODYSSEY_API_BASE`와 `CODYSSEY_MODEL`을 Variable로 등록합니다. GitHub 저장소와 Hugging Face Space는 별도 Git 저장소이므로 GitHub에 푸시한 뒤 Space에도 변경 파일을 커밋·푸시해야 배포됩니다.
 자세한 절차는 [배포 가이드](docs/DEPLOY_HF.md)를 참고하세요.
 
 ### 상태 확인
@@ -202,16 +231,18 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 
 ---
 
-## 사용자 테스트 결과
+## 사용자 평가 운영 현황
 
-| 항목 | 결과 |
+| 항목 | 현재 상태 |
 |---|---|
-| 참여자 | (테스트 후 기입) |
-| 분석 이해도 / 공감도 / 추천 유용성 / 접근성 | (테스트 후 기입) |
-| 사용자 피드백으로 수정한 항목 | (테스트 후 기입) |
-| 자체 점검으로 수정한 항목 | **8건** — [피드백 기록](docs/피드백기록.md) (사용자 응답과 별도로 집계) |
+| 수집 경로 | 배포 앱 → Google Apps Script → Google Sheets |
+| 평가 항목 | 디자인 / 감정 도움 / 계속 사용할 의향 각 1~5점 + 필수 개선 의견 |
+| 참여자 구분 | 자동 참여 코드의 서로 다른 개수로 집계. 제출 건수와 참여자 수를 구분 |
+| 중복 방지 | 제출 ID가 같은 재전송은 한 행으로 저장 |
+| 실제 결과 | 사용자 수집 후 원본 응답을 임의로 바꾸지 않고 평균·분포·주요 의견을 기록 |
+| 자체 점검 | 사용자 응답과 분리해 [피드백 기록](docs/피드백기록.md)에 관리 |
 
-개선 전후 비교는 [피드백 기록](docs/피드백기록.md)에 있습니다.
+진행 방법은 [사용자 테스트 안내](docs/사용자테스트진행안내.md), 결과 요약 양식은 [사용자 테스트 기록지](docs/사용자테스트기록지.md)에 있습니다.
 
 ---
 
@@ -219,6 +250,8 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 <summary><b>📁 전체 문서 목록</b></summary>
 
 ### 제출 문서
+> 아래 문서는 최초 제출 시점의 설계와 결과를 보존합니다. 현재 운영 방식은 README와 운영 안내 문서를 기준으로 합니다.
+
 - [기획서](docs/기획서.md) — 문제 정의·타겟·AI 활용·기술 접근·일정
 - [결과보고서](docs/결과보고서.md) — 평가 항목별 구현 결과
 - [기능명세서](docs/기능명세서.md) — 기능·비기능 요구사항
@@ -240,6 +273,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 
 ### 운영 안내
 - [배포 가이드](docs/DEPLOY_HF.md) · [실행 가이드](docs/RUN.md)
+- [Google Sheets 평가 수집 안내](docs/GOOGLE_SHEETS_SURVEY.md) · [Apps Script 수신 코드](docs/google_sheets_receiver.gs)
 - [사용자 테스트 진행 안내](docs/사용자테스트진행안내.md) · [테스트 기록지](docs/사용자테스트기록지.md)
 
 </details>
@@ -250,7 +284,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 
 - 생성형 응답이 감정 라벨·출처 카드만 참조하므로 개별 상황 묘사의 구체성은 낮습니다.
 - 추론형 모델을 쓰고 있어 코치 문장 생성에 약 12초가 걸립니다.
-- 무료 Space는 영구 디스크가 없어 재시작 시 피드백·선호 데이터가 초기화됩니다. 일기와 기록 그래프는 기기 안에 있어 영향받지 않습니다.
+- 무료 Space는 영구 디스크가 없어 재시작 시 SQLite의 선호 기억과 기존 피드백 데이터가 초기화됩니다. Google Sheets 앱 평가와 브라우저의 일기·기록 그래프는 영향을 받지 않습니다.
 - 기록이 기기별로 분리됩니다. 폰과 PC의 그래프는 서로 다릅니다.
 - 위치 기반 추천(러닝 코스·근처 장소)은 권한·지도 API 검토 후 2단계입니다.
 - 초기에 Hugging Face 측 CPU 쿼터 오류로 기동이 막혀, 그동안 임시 HTTPS 경로로 시연·테스트했습니다. 현재는 해제되어 위 주소가 상시 동작합니다.

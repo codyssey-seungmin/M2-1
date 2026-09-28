@@ -1,6 +1,6 @@
 # Hugging Face Space 배포 가이드
 
-> **현재 상태 (2026-09-21): 배포 완료 · 상시 동작.** https://yellowmug-mindily.hf.space
+> **현재 상태 (2026-09-28): 앱 평가 기능을 포함해 배포 완료 · 동작 확인.** https://yellowmug-mindily.hf.space
 > 코드를 고친 뒤 다시 올릴 때는 저장소 루트의 `push_to_huggingface.cmd` 를 실행하면 됩니다.
 
 기존 Render 설정은 유료 플랜(1c-2g + 2GB 디스크)을 전제로 해 막혀 있었습니다. **무료 등급으로 영구 HTTPS URL을 얻을 수 있는 Hugging Face Spaces**로 전환했습니다.
@@ -26,20 +26,25 @@
    - **Visibility**: Public
 3. **Create Space**
 
-## 2. 생성형 AI 키 등록
+## 2. 환경변수와 Secret 등록
 
 Space 페이지 → **Settings** → *Variables and secrets*
 
 | 이름 | 종류 | 값 |
 |---|---|---|
 | `CODYSSEY_API_KEY` | **Secret** | 코디세이에서 발급받은 API 키 |
-| `CODYSSEY_API_BASE` | Variable | 코디세이 엔드포인트 (예: `https://api.codyssey.kr/v1`) |
-| `CODYSSEY_MODEL` | Variable | 코디세이에서 지정한 모델명 (예: `gpt-4o-mini`) |
+| `CODYSSEY_API_BASE` | Variable | 코디세이에서 안내받은 `/v1` 엔드포인트 |
+| `CODYSSEY_MODEL` | Variable | 코디세이에서 지정한 모델명 (예: `gpt-5-mini`) |
+| `MINDILY_SURVEY_WEBHOOK_URL` | **Secret** | 배포된 Google Apps Script 웹 앱의 `/exec` URL |
 
-> 세 값은 코디세이에서 안내받은 것을 그대로 넣습니다. OpenAI 호환 규격이므로 다른 공급자로 바꿀 때도 이 세 값만 교체하면 됩니다.
+> 코디세이 관련 세 값은 안내받은 것을 그대로 넣습니다. Google Sheets 평가를 사용하려면 `MINDILY_SURVEY_WEBHOOK_URL`도 필요합니다. 웹 앱 URL과 API 키는 GitHub 파일이나 화면 캡처에 노출하지 않습니다. OpenAI 호환 규격이므로 다른 공급자로 바꿀 때도 이 세 값만 교체하면 됩니다.
 > 키를 등록하지 않아도 서비스는 동작합니다. 코치 문장이 규칙 기반으로 폴백되고, `/api/llm/status`가 `mode: deterministic_fallback`을 반환합니다.
 
 ## 3. 배포
+
+GitHub `codyssey-seungmin/M2-1`과 Hugging Face `yellowmug/mindily`는 별도 Git 저장소입니다. GitHub의 변경은 Space에 자동 반영되지 않습니다. 기존 Space 이력을 보존하려면 Space 저장소를 별도 폴더에 clone하고 변경 파일을 복사한 뒤 일반 커밋과 push를 사용합니다. force push는 사용하지 않습니다. 인증에는 계정 비밀번호 대신 쓰기 권한의 Hugging Face 토큰을 사용하며 토큰은 명령어·문서·캡처에 넣지 않습니다.
+
+자동 배포 스크립트를 사용하는 경우:
 
 ```bash
 # 최초 1회: HF 로그인
@@ -88,19 +93,12 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 
 ## 알아둘 점
 
-### 데이터가 영구 저장되지 않습니다
-무료 등급 Space는 영구 디스크가 없어 **재시작(코드 푸시·장시간 미사용 후 재개)하면 SQLite가 초기화**됩니다.
+### 데이터 저장 위치가 나뉩니다
+무료 등급 Space는 영구 디스크가 없어 **재시작하면 SQLite의 선호 기억과 기존 피드백 데이터가 초기화**될 수 있습니다. 현재 앱 평가 화면의 응답은 외부 Google Sheets에 저장되므로 Space 재시작의 영향을 받지 않습니다. 일기와 기록은 각 사용자 브라우저에 저장됩니다.
 
-사용자 테스트 직후 반드시 집계를 내려받으세요.
+Google Sheets는 필요한 팀원에게만 공유하고, 과제 평가·분석이 끝나면 정한 보존 기준에 따라 정리합니다. 기존 SQLite 집계를 사용하는 경우에만 재시작 전에 별도로 내려받습니다.
 
-```bash
-# Space의 Files 탭에서는 런타임 생성 파일을 볼 수 없으므로,
-# 테스트 종료 직후 아래 엔드포인트나 로컬 재현으로 집계를 확보한다.
-python feedback_summary.py > evidence/user-test-summary.txt
-git add evidence/user-test-summary.txt && git commit -m "Add user test summary"
-```
-
-필요하면 Space Settings에서 **Persistent Storage**(유료)를 켜고 `MINDILY_FEEDBACK_DB` / `MINDILY_MEMORY_DB`를 `/data/` 아래로 바꾸면 됩니다.
+기존 SQLite 피드백을 계속 운영할 때만 별도의 내보내기 또는 Persistent Storage 설정이 필요합니다. 현재 Google Sheets 앱 평가에는 해당하지 않습니다.
 
 ### 절전 모드
 무료 Space는 48시간 미사용 시 절전합니다. 발표·테스트 **10분 전에 URL을 한 번 열어** 깨워 두세요.
