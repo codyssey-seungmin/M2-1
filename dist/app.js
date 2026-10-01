@@ -467,6 +467,33 @@ function startNatureSound(kind) {
 
 const organizerKey = 'mindily-thoughts';
 const organizerFields = ['event', 'feeling', 'need'];
+function readOrganizer() {
+  try { return JSON.parse(localStorage.getItem(organizerKey) || 'null'); }
+  catch (_) { return null; }
+}
+
+function organizerSavedLabel(value) {
+  const savedAt = new Date(value);
+  if (Number.isNaN(savedAt.getTime())) return '저장됨';
+  const today = new Date();
+  const isToday = savedAt.getFullYear() === today.getFullYear()
+    && savedAt.getMonth() === today.getMonth()
+    && savedAt.getDate() === today.getDate();
+  return isToday ? '오늘 저장' : `${savedAt.getMonth() + 1}월 ${savedAt.getDate()}일 저장`;
+}
+
+function renderOrganizerSummary() {
+  const saved = readOrganizer();
+  const summary = document.getElementById('organizer-summary');
+  summary.hidden = !saved;
+  document.getElementById('organizer-open-button').textContent = saved ? '저장한 내용 보기·수정' : '시작하기';
+  if (!saved) return;
+  document.getElementById('organizer-summary-date').textContent = organizerSavedLabel(saved.saved_at);
+  organizerFields.forEach((name) => {
+    document.getElementById(`organizer-summary-${name}`).textContent = saved[name] || '작성하지 않았어요.';
+  });
+}
+
 document.getElementById('need-examples').addEventListener('click', (event) => {
   const choice = event.target.closest('[data-need-example]');
   if (!choice) return;
@@ -476,12 +503,12 @@ document.getElementById('need-examples').addEventListener('click', (event) => {
   field.focus();
 });
 function hydrateOrganizer() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(organizerKey) || 'null');
-    if (!saved) return;
+  const saved = readOrganizer();
+  if (saved) {
     organizerFields.forEach((name) => { document.getElementById(`organize-${name}`).value = saved[name] || ''; });
     document.getElementById('organize-status').textContent = '이 브라우저에 저장된 내용을 다시 볼 수 있어요.';
-  } catch (_) {}
+  }
+  renderOrganizerSummary();
 }
 
 document.getElementById('organize-draft-button').addEventListener('click', async (event) => {
@@ -520,8 +547,9 @@ document.getElementById('organize-form').addEventListener('submit', (event) => {
   try {
     localStorage.setItem(organizerKey, JSON.stringify({...values, saved_at: new Date().toISOString()}));
     document.getElementById('organize-status').textContent = '이 브라우저에 저장했어요.';
+    renderOrganizerSummary();
     document.getElementById('organize-dialog').close();
-    toast('마음을 정리한 내용을 이 브라우저에 저장했어요.');
+    toast('저장했어요. 마음 기록에서 다시 볼 수 있어요.');
   } catch (_) { toast('이 브라우저에 저장할 수 없어요. 저장 설정을 확인해주세요.'); }
 });
 
@@ -531,6 +559,7 @@ document.getElementById('delete-organized-thoughts').addEventListener('click', (
     localStorage.removeItem(organizerKey);
     document.getElementById('organize-form').reset();
     document.getElementById('organize-status').textContent = '저장된 정리 내용이 없어요.';
+    renderOrganizerSummary();
     toast('정리 내용을 삭제했어요.');
   } catch (_) { toast('정리 내용을 삭제하지 못했어요.'); }
 });

@@ -162,7 +162,7 @@
         <article class="card recommendation organizer-card">
           <div class="rec-icon blue" aria-hidden="true">✎</div>
           <div><span class="soft-chip">스스로 정리하기</span><h3>감정 정리하기</h3><p>있었던 일과 지금 필요한 것을 세 문장으로 적어봐요.</p></div>
-          <button class="secondary-button" type="button" data-open-dialog="organize-dialog">시작하기</button>
+          <button class="secondary-button" type="button" id="organizer-open-button" data-open-dialog="organize-dialog">시작하기</button>
         </article>
         <div class="card memory-card">
           <h3>다음 휴식에 기억할까요?</h3>
@@ -210,6 +210,14 @@
           </div>
           <small class="model-note">스트레스·감정 수치는 기록에서 계산하고, 주요 사건 초안은 일기 내용에서 만듭니다. 원문 전체는 보고서 파일에 넣지 않아요. 의학적 판단이나 진단이 아니에요.</small>
         </section>
+        <article class="card organizer-summary" id="organizer-summary" aria-labelledby="organizer-summary-heading" hidden>
+          <div class="section-heading organizer-summary-heading"><div class="organizer-summary-title"><span class="organizer-summary-mark" aria-hidden="true">✎</span><h3 id="organizer-summary-heading">최근 감정 정리</h3></div><span class="soft-chip" id="organizer-summary-date">오늘 저장</span></div>
+          <div class="organizer-summary-row"><span class="organizer-summary-icon event" aria-hidden="true">▤</span><div><small>무슨 일이 있었나요?</small><p id="organizer-summary-event"></p></div></div>
+          <div class="organizer-summary-row"><span class="organizer-summary-icon feeling" aria-hidden="true">≋</span><div><small>어떤 마음이 들었나요?</small><p id="organizer-summary-feeling"></p></div></div>
+          <div class="organizer-summary-row"><span class="organizer-summary-icon need" aria-hidden="true">♧</span><div><small>지금 무엇이 필요할까요?</small><p id="organizer-summary-need"></p></div></div>
+          <button class="secondary-button organizer-summary-open" type="button" data-open-dialog="organize-dialog">전체 보기 · 수정</button>
+          <small class="organizer-summary-privacy">▣ 이 브라우저에만 저장돼요.</small>
+        </article>
         <div class="card recent-entry"><div class="section-heading"><h3>최근 기록</h3><span id="record-date">오늘</span></div><div class="entry-title"><span id="record-emoji">😮‍💨</span><strong id="record-mood">걱정되는</strong><span class="soft-chip" id="record-stress">스트레스 3/5</span></div><p id="record-copy">오늘의 마음을 기록하면 여기에 일기와 AI가 정리한 감정이 남아요.</p></div>
         <button class="text-button" type="button" id="delete-records">이 브라우저의 모든 일기 기록 삭제</button>
       </section>

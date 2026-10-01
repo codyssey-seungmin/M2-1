@@ -197,6 +197,22 @@ dialog { border: 0; padding: 0; color: var(--ink); }.sheet-dialog { width: min(4
 .report-bar small { flex: 0 0 22px; text-align: right; font-weight: 600; color: var(--muted); }
 .report-empty { margin: 0; font-size: 13px; color: var(--muted); }
 .report-card .model-note { display: block; margin-top: 14px; }
+.organizer-summary { margin-top: 12px; padding: 18px; }
+.organizer-summary-heading { margin: 0 0 5px; align-items: center; }
+.organizer-summary-title { display: flex; align-items: center; gap: 10px; }
+.organizer-summary-title h3 { margin: 0; }
+.organizer-summary-mark { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; background: #e7ecff; color: #5d79d9; font-size: 19px; }
+.organizer-summary-row { display: grid; grid-template-columns: 38px 1fr; gap: 11px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+.organizer-summary-row:last-of-type { border-bottom: 0; }
+.organizer-summary-row > div { min-width: 0; }
+.organizer-summary-row small { display: block; margin-bottom: 4px; color: var(--muted); font-size: 11px; }
+.organizer-summary-row p { margin: 0; color: var(--ink); font-size: 13px; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; white-space: pre-line; }
+.organizer-summary-icon { width: 38px; height: 38px; border-radius: 13px; display: grid; place-items: center; font-size: 18px; font-weight: 700; }
+.organizer-summary-icon.event { background: #e8edff; color: #607bd9; }
+.organizer-summary-icon.feeling { background: #eee9fa; color: #7465a6; font-size: 23px; line-height: 1; }
+.organizer-summary-icon.need { background: #e5f3e7; color: #5c9b70; }
+.organizer-summary-open { width: 100%; margin-top: 10px; }
+.organizer-summary-privacy { display: block; margin-top: 10px; text-align: center; color: var(--muted); font-size: 10px; }
 .draft-controls { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 14px; display: grid; gap: 10px; }
 .draft-controls h4, .draft-controls p { margin: 0; }
 .draft-controls h4 { font-size: 14px; }
