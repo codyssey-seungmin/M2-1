@@ -618,11 +618,22 @@ function saveEntry(entry) {
 
 function updateRecordUI(entry) {
   const lead = entry.ranked[0].name;
-  document.getElementById('record-date').textContent = '오늘';
+  const recordDate = document.getElementById('record-date');
+  const savedAt = new Date(entry.date);
+  const today = new Date();
+  const isToday = !Number.isNaN(savedAt.getTime())
+    && savedAt.getFullYear() === today.getFullYear()
+    && savedAt.getMonth() === today.getMonth()
+    && savedAt.getDate() === today.getDate();
+  recordDate.textContent = Number.isNaN(savedAt.getTime()) ? '저장됨' : (isToday ? '오늘' : dateText(entry.date));
+  recordDate.hidden = false;
   document.getElementById('record-emoji').textContent = emotionMeta[lead][0];
   document.getElementById('record-mood').textContent = selectedMood.name;
-  document.getElementById('record-stress').textContent = `스트레스 ${entry.stress}/5`;
+  const recordStress = document.getElementById('record-stress');
+  recordStress.textContent = `스트레스 ${entry.stress}/5`;
+  recordStress.hidden = false;
   document.getElementById('record-copy').textContent = entry.text;
+  document.getElementById('delete-records').hidden = false;
   document.getElementById('latest-mood').textContent = selectedMood.name;
   document.getElementById('home-coach-message').textContent = '기록한 마음을 확인했어요. 어떤 휴식이 필요한지 천천히 골라보세요.';
   const dots = document.querySelector('.stress-dots');
@@ -1184,8 +1195,13 @@ document.addEventListener('click', (event) => {
 function hydrateLatest() {
   try {
     const entry = JSON.parse(localStorage.getItem('mindily-records') || '[]')[0];
-    if (entry) { lastAnalysis = entry; selectedMood = entry.confirmedMood || {name: entry.detailedMood || '직접 골라주세요', color:'#b7bfce'}; updateRecordUI(entry); }
-  } catch (_) {}
+    if (!entry) return;
+    lastAnalysis = entry;
+    selectedMood = entry.confirmedMood || {name: entry.detailedMood || '직접 골라주세요', color:'#b7bfce'};
+    updateRecordUI(entry);
+  } catch (_) {
+    // HTML의 빈 상태를 그대로 유지한다.
+  }
 }
 
 document.getElementById('delete-records').addEventListener('click', () => {
