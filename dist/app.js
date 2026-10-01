@@ -386,15 +386,21 @@ document.addEventListener('click', (event) => {
   if (soundButton) { toggleNatureSound(soundButton.dataset.sound); }
 });
 
-// 빗소리와 바람 소리는 브라우저에서 합성하고, 파도 소리는 CC BY 음원을 재생한다.
+// 빗소리와 파도 소리는 CC BY 음원을 재생하고, 바람 소리는 브라우저에서 합성한다.
 let audioContext = null;
 let currentSound = null;
+const recordedNatureSounds = {
+  rain: 'audio/rain-deoksugung-cc-by.mp3',
+  waves: 'audio/waves-rocks-cc-by.mp3'
+};
 
 async function toggleNatureSound(kind) {
   if (currentSound && currentSound.kind === kind) { stopNatureSound(); renderHealing(); return; }
   stopNatureSound();
   try {
-    currentSound = kind === 'waves' ? await startWaveSound() : startNatureSound(kind);
+    currentSound = recordedNatureSounds[kind]
+      ? await startRecordedNatureSound(kind, recordedNatureSounds[kind])
+      : startNatureSound(kind);
   } catch (_) {
     toast('이 브라우저에서는 소리를 재생할 수 없어요.');
     currentSound = null;
@@ -408,14 +414,14 @@ function stopNatureSound() {
   currentSound = null;
 }
 
-async function startWaveSound() {
-  const audio = new Audio('audio/waves-rocks-cc-by.mp3');
+async function startRecordedNatureSound(kind, source) {
+  const audio = new Audio(source);
   audio.loop = true;
   audio.preload = 'auto';
   audio.volume = 0.7;
   await audio.play();
   return {
-    kind: 'waves',
+    kind,
     stop() {
       audio.pause();
       audio.currentTime = 0;

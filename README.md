@@ -20,7 +20,7 @@
 ```
 일기 작성 → 감정 분석(KcELECTRA) → 무드 미터에서 직접 수정
         → 출처 접지 코치 문장(생성형 AI) + 명언·꽃·향
-        → 활동을 앱 안에서 바로 실행 (빗소리·바람은 브라우저 합성, 파도는 실제 음원)
+        → 활동을 앱 안에서 바로 실행 (빗소리·파도는 실제 음원, 바람은 브라우저 합성)
         → 기록 누적 → 주·월·연 흐름과 감정 분석 보고서
         → 앱 평가 3항목·개선 의견 → Google Sheets 익명 수집
         → (동의 시) 선호 활동 30일 기억
@@ -121,7 +121,7 @@ generation: llm_grounded   ·  11.9초  ·  모델 gpt-5-mini (코디세이 제�
 | 아이폰 · Safari | 공유(↑) → **홈 화면에 추가** |
 | PC · Chrome/Edge | 주소창 오른쪽 설치 아이콘 |
 
-서비스 워커는 **화면 자원(HTML·CSS·JS·아이콘)과 파도 음원**을 캐시합니다. `/api/*` 응답은 캐시하지 않으므로
+서비스 워커는 **화면 자원(HTML·CSS·JS·아이콘)과 빗소리·파도 음원**을 캐시합니다. `/api/*` 응답은 캐시하지 않으므로
 감정 분석 결과가 오래된 값으로 보이는 일이 없고, 일기 내용이 캐시에 남지도 않습니다.
 오프라인에서는 화면이 열리고 일기 작성은 가능하지만, 분석은 연결된 뒤에 수행됩니다.
 
@@ -294,4 +294,5 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 - 감정 분류 모델: [GGARA02/kcelectra-korean-emotion](https://huggingface.co/GGARA02/kcelectra-korean-emotion)
 - 활동 카드 출처: NHS · WHO · RHS · Project Gutenberg (각 카드에 링크 표시)
 - 필사·음악 콘텐츠는 저작권 만료 또는 공개 라이선스 자료만 사용합니다.
+- 빗소리 음원: 한국저작권위원회, [「덕수궁 빗소리」](https://gongu.copyright.or.kr/gongu/wrt/wrt/view.do?menuNo=200020&wrtSn=13220728), **CC BY**. 앱에는 원본 MP3를 `dist/audio/rain-deoksugung-cc-by.mp3`로 포함합니다.
 - 파도 음원: 한국저작권위원회, [「바위에 부딪히는 강렬한 파도소리」](https://gongu.copyright.or.kr/gongu/wrt/wrt/view.do?menuNo=200020&wrtSn=13220738), **CC BY**. 앱에는 원본 MP3를 `dist/audio/waves-rocks-cc-by.mp3`로 포함합니다.

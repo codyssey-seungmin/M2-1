@@ -66,8 +66,8 @@ ACTIVITIES = (
                   '눈을 감고 빗줄기가 굵어졌다 가늘어지는 흐름을 따라갑니다.',
                   '생각이 떠오르면 밀어내지 말고 소리로 다시 돌아옵니다.',
                   '충분해지면 정지 버튼을 누릅니다.'],
-        'source_title': '브라우저에서 직접 만든 소리 (녹음 파일 아님)',
-        'source_url': 'https://developer.mozilla.org/ko/docs/Web/API/Web_Audio_API',
+        'source_title': '한국저작권위원회 「덕수궁 빗소리」 (CC BY)',
+        'source_url': 'https://gongu.copyright.or.kr/gongu/wrt/wrt/view.do?menuNo=200020&wrtSn=13220728',
     },
     {
         'id': 'sound-wind', 'kind': '자연의 소리', 'title': '바람 소리 듣기', 'minutes': 5,
