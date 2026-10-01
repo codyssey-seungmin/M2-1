@@ -386,18 +386,17 @@ document.addEventListener('click', (event) => {
   if (soundButton) { toggleNatureSound(soundButton.dataset.sound); }
 });
 
-// 자연의 소리는 녹음 파일이 아니라 브라우저가 실시간으로 만든다.
-// 저작권 문제가 없고 앱 용량도 늘지 않는다.
+// 빗소리와 바람 소리는 브라우저에서 합성하고, 파도 소리는 CC BY 음원을 재생한다.
 let audioContext = null;
 let currentSound = null;
 
-function toggleNatureSound(kind) {
+async function toggleNatureSound(kind) {
   if (currentSound && currentSound.kind === kind) { stopNatureSound(); renderHealing(); return; }
   stopNatureSound();
   try {
-    currentSound = startNatureSound(kind);
+    currentSound = kind === 'waves' ? await startWaveSound() : startNatureSound(kind);
   } catch (_) {
-    toast('이 브라우저에서는 소리를 만들 수 없어요.');
+    toast('이 브라우저에서는 소리를 재생할 수 없어요.');
     currentSound = null;
   }
   renderHealing();
@@ -407,6 +406,23 @@ function stopNatureSound() {
   if (!currentSound) return;
   currentSound.stop();
   currentSound = null;
+}
+
+async function startWaveSound() {
+  const audio = new Audio('audio/waves-rocks-cc-by.mp3');
+  audio.loop = true;
+  audio.preload = 'auto';
+  audio.volume = 0.7;
+  await audio.play();
+  return {
+    kind: 'waves',
+    stop() {
+      audio.pause();
+      audio.currentTime = 0;
+      audio.removeAttribute('src');
+      audio.load();
+    }
+  };
 }
 
 function startNatureSound(kind) {

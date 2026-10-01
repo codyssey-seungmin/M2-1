@@ -2,10 +2,10 @@
  * 목적: 홈 화면에 설치해 앱처럼 열고, 화면 껍데기는 오프라인에서도 뜨게 한다.
  * 원칙:
  *  - /api/* 응답은 절대 캐시하지 않는다. 감정 분석 결과와 일기 관련 응답은 항상 서버에서 받는다.
- *  - 캐시에는 화면 자원(HTML·CSS·JS·아이콘)만 담는다.
+ *  - 캐시에는 화면 자원(HTML·CSS·JS·아이콘)과 파도 음원을 담는다.
  *  - 버전을 올리면 이전 캐시는 즉시 삭제된다.
  */
-const VERSION = 'mindily-r20260923rating5';
+const VERSION = 'mindily-r20261001waves1';
 const SHELL = [
   './',
   'index.html',
@@ -14,6 +14,7 @@ const SHELL = [
   'icon-512.png',
   'icon-maskable-512.png',
   'apple-touch-icon.png',
+  'audio/waves-rocks-cc-by.mp3',
 ];
 
 self.addEventListener('install', (event) => {

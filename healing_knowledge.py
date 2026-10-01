@@ -90,8 +90,8 @@ ACTIVITIES = (
                   '열 번을 세는 동안 다른 생각은 잠시 내려둡니다.',
                   '숫자를 놓쳐도 괜찮습니다. 다시 하나부터 셉니다.',
                   '충분해지면 정지 버튼을 누릅니다.'],
-        'source_title': '브라우저에서 직접 만든 소리 (녹음 파일 아님)',
-        'source_url': 'https://developer.mozilla.org/ko/docs/Web/API/Web_Audio_API',
+        'source_title': '한국저작권위원회 「바위에 부딪히는 강렬한 파도소리」 (CC BY)',
+        'source_url': 'https://gongu.copyright.or.kr/gongu/wrt/wrt/view.do?menuNo=200020&wrtSn=13220738',
     },
 )
 
