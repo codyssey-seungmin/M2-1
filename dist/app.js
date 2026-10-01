@@ -326,6 +326,25 @@ async function loadHealingRecommendations() {
 // 고를 때마다 전체를 다시 그리면 화면이 위로 튀므로, 상세 영역만 갈아끼운다.
 function healingDetailHtml(card) {
   const steps = (card.steps || []).map(step => `<li>${escapeHtml(step)}</li>`).join('');
+  let copyingQuote = '';
+  if (card.id === 'copying-10m') {
+    const quote = lastAnalysis && lastAnalysis.comfort && lastAnalysis.comfort.quote;
+    if (quote) {
+      const author = quote.source_url && quote.source_url.startsWith('https://')
+        ? `<a href="${escapeHtml(quote.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(quote.author)}</a>`
+        : escapeHtml(quote.author);
+      copyingQuote = `<div class="quote-block heal-copying-quote">
+        <span class="eyebrow">오늘의 필사 문장</span>
+        <blockquote class="quote-text">${escapeHtml(quote.text)}</blockquote>
+        <cite class="quote-by">— ${author}<span class="quote-license">${escapeHtml(quote.license)}</span></cite>
+      </div>`;
+    } else {
+      copyingQuote = `<div class="quote-block heal-copying-quote">
+        <span class="eyebrow">오늘의 필사 문장</span>
+        <p class="model-note">인용구를 불러오지 못했어요. 감정 일기를 다시 분석한 뒤 이용해주세요.</p>
+      </div>`;
+    }
+  }
   let action = '';
   if (card.id === 'breathing-1m') {
     action = '<button class="secondary-button" type="button" data-start-breath>1분 호흡 시작하기</button>';
@@ -337,6 +356,7 @@ function healingDetailHtml(card) {
        <span class="heal-min">약 ${card.minutes}분</span></div>
      <h3>${escapeHtml(card.title)}</h3>
      <p class="heal-desc">${escapeHtml(card.description)}</p>
+     ${copyingQuote}
      ${steps ? `<ol class="heal-steps">${steps}</ol>` : ''}
      ${action}
      <small class="model-note">출처 · ${card.source_url && card.source_url.startsWith('https://')
