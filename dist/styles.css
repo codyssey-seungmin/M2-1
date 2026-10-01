@@ -96,6 +96,7 @@ p { color: var(--muted); line-height: 1.62; font-size: 15px; }
 .progress-track { grid-column: 1 / -1; height: 8px; border-radius: 99px; background: #ececf2; overflow: hidden; margin: 5px 0 14px; }.progress-track span { display: block; height: 100%; width: 0; background: linear-gradient(90deg, #85c0a7, #6fab92); border-radius: inherit; transition: width .7s ease; }
 .secondary-button { background: #cfe7d5; color: #2f6c56; box-shadow: none; }.mission-card .secondary-button { grid-column: 1/-1; }
 .recommendation a.secondary-button { display: flex; align-items: center; justify-content: center; text-align: center; padding: 8px 14px; min-height: 44px; text-decoration: none; }
+.organizer-card { margin-top: 14px; }
 .memory-card { margin-top: 14px; padding: 18px; display: grid; gap: 10px; }
 .memory-card h3, .memory-card p { margin: 0; }
 .memory-card select { width: 100%; min-height: 48px; border: 1px solid var(--line); border-radius: 14px; padding: 0 12px; background: white; color: var(--ink); font: inherit; }
