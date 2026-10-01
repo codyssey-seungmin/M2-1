@@ -54,6 +54,7 @@ function showScreen(name, push = true) {
   screenTitle.textContent = titles[name];
   backButton.hidden = isHome || ['diary', 'coach', 'records'].includes(name);
   document.querySelector(`[data-screen="${name}"]`).scrollTop = 0;
+  if (name === 'coach') loadHealingRecommendations();
 }
 
 document.addEventListener('click', (event) => {
@@ -286,7 +287,6 @@ function renderAnalysis() {
   renderComfort(lastAnalysis.comfort);
   updateMoodUI();
   updateRecordUI(lastAnalysis);
-  loadHealingRecommendations();
 }
 
 let healingCards = [];
@@ -298,10 +298,16 @@ const KIND_ICON = {
 };
 
 async function loadHealingRecommendations() {
-  if (!lastAnalysis) return;
+  const host = document.getElementById('healing-host');
+  if (!host) return;
+  if (!lastAnalysis) {
+    host.innerHTML = '<p class="model-note">감정 일기를 작성하면 지금 마음에 맞는 휴식 활동을 추천해드려요.</p>';
+    return;
+  }
   try {
     let data = lastAnalysis.recommendation;
     if (!data) {
+      host.innerHTML = '<p class="model-note">추천 활동을 불러오는 중이에요…</p>';
       const response = await fetch('/api/healing/recommend', {
         method: 'POST', headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({emotion: lastAnalysis.ranked[0].name, stress: lastAnalysis.stress, minutes: 20,
@@ -317,8 +323,7 @@ async function loadHealingRecommendations() {
     }
     renderHealing();
   } catch (_) {
-    const host = document.getElementById('healing-host');
-    if (host) host.innerHTML = '<p class="model-note">추천을 불러오지 못했어요. 잠시 후 다시 열어주세요.</p>';
+    host.innerHTML = '<p class="model-note">추천을 불러오지 못했어요. 잠시 후 다시 열어주세요.</p>';
   }
 }
 
