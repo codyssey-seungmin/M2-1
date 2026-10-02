@@ -46,7 +46,7 @@ curl https://yellowmug-mindily.hf.space/api/health      # status: ready, 모델�
 curl https://yellowmug-mindily.hf.space/api/llm/status  # llm_grounded 여부와 last_error
 ```
 
-자세한 절차와 환경 변수는 [배포 가이드](DEPLOY_HF.md), 처음 하는 경우에는 [배포 시작하기](../배포_시작하기.md)를 참고합니다.
+자세한 절차와 환경 변수는 [배포 가이드](DEPLOY_HF.md)를 참고합니다.
 
 Vercel에는 현재 Python API 전체를 그대로 올리기 어렵습니다. Python Function의 압축 해제 후 크기 상한이 500MB이고 파일 저장이 영속적이지 않아, PyTorch 모델과 SQLite를 쓰는 이 구조에는 맞지 않습니다.
 
@@ -56,7 +56,7 @@ requirements-dev.txt 설치 후 서버를 8010 포트에서 실행하고 python 
 
 ## 데이터 처리
 분석 시 글이 이 앱의 서버로 전송되며 서버 코드는 원문을 저장하지 않습니다. 운영 호스팅의 로그 정책은 별도 확인이 필요합니다.
-현재 브라우저 localStorage에 최대 30개 기록을 저장합니다. 같은 브라우저 사용자 간 분리와 기기 간 동기화는 미구현입니다.
+현재 브라우저 localStorage에 최대 400개 기록을 저장합니다. 같은 브라우저 사용자 간 분리와 기기 간 동기화는 미구현입니다.
 일기 원문도 localStorage 기록에 포함됩니다. 공용 기기에서 사용하면 같은 브라우저의 다른 사람이 읽을 수 있으므로 마음 기록 화면의 삭제 버튼으로 기록을 지워야 합니다.
 새 앱 평가는 디자인·감정 도움·계속 사용할 의향 1~5점, 필수 개선 의견, 자동 참여 코드, 중복 방지용 제출 ID를 Google Sheets에 저장합니다. 이름·이메일·일기 원문은 평가에 포함하지 않습니다. 참여 코드는 같은 브라우저의 반복 평가를 묶고, 제출 ID는 같은 평가 요청의 중복 행을 막습니다. 기존 `/api/feedback`의 SQLite 저장은 과거 기능과 호환을 위해 남아 있지만 현재 앱 평가 화면의 수집 경로는 아닙니다.
 

@@ -9,7 +9,7 @@
 | 🌐 **서비스 열기** | **https://yellowmug-mindily.hf.space** · [Space 관리](https://huggingface.co/spaces/yellowmug/mindily) |
 | 📄 **결과보고서** | [docs/결과보고서.md](docs/결과보고서.md) |
 | 📊 **발표자료** | [docs/presentation.pdf](docs/presentation.pdf) · [편집용 .pptx](docs/presentation.pptx) |
-| 🎬 **시연 영상** | [docs/mindily-demo-3min.mp4](docs/mindily-demo-3min.mp4) · 3분 01초 (대본: [시연영상대본](docs/시연영상대본.md)) |
+| 🎬 **시연 영상** | [docs/mindily-demo-3min.mp4](docs/mindily-demo-3min.mp4) · 3분 01초 |
 
 ---
 
@@ -240,6 +240,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 | 참여자 구분 | 자동 참여 코드의 서로 다른 개수로 집계. 제출 건수와 참여자 수를 구분 |
 | 중복 방지 | 제출 ID가 같은 재전송은 한 행으로 저장 |
 | 실제 결과 | 사용자 수집 후 원본 응답을 임의로 바꾸지 않고 평균·분포·주요 의견을 기록 |
+| 정성 의견 처리 | `.` 등 의미를 해석할 수 없는 의견은 원본을 보존하고 정성 분석에서만 제외. 유효한 실제 사용자 점수는 정량 집계에 유지 |
 | 자체 점검 | 사용자 응답과 분리해 [피드백 기록](docs/피드백기록.md)에 관리 |
 
 진행 방법은 [사용자 테스트 안내](docs/사용자테스트진행안내.md), 결과 요약 양식은 [사용자 테스트 기록지](docs/사용자테스트기록지.md)에 있습니다.
@@ -247,23 +248,20 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 ---
 
 <details>
-<summary><b>📁 전체 문서 목록</b></summary>
+<summary><b>📁 핵심 문서 목록</b></summary>
 
 ### 제출 문서
-> 아래 문서는 최초 제출 시점의 설계와 결과를 보존합니다. 현재 운영 방식은 README와 운영 안내 문서를 기준으로 합니다.
+> 과제 요구사항과 최종 결과를 확인하는 데 필요한 문서만 정리했습니다.
 
 - [기획서](docs/기획서.md) — 문제 정의·타겟·AI 활용·기술 접근·일정
 - [결과보고서](docs/결과보고서.md) — 평가 항목별 구현 결과
 - [기능명세서](docs/기능명세서.md) — 기능·비기능 요구사항
 - [시스템 아키텍처](docs/architecture.md) — 계층 구조와 설계 근거
-- [발표자료 구성안](docs/발표자료구성안.md) · [시연계획서](docs/시연계획서.md)
+- [발표자료](docs/presentation.pdf) · [편집용 PPTX](docs/presentation.pptx) · [시연 영상](docs/mindily-demo-3min.mp4)
 - [팀 역할 및 기여 기록](docs/TEAM_ROLES.md)
 
 ### 기록·분석
 - [모델 적용 결과](docs/모델적용결과.md) — 실제 분류 결과·추가 학습 측정값·채택 판단
-- [모델학습보고서](docs/모델학습보고서.md) — 전처리·토큰화·학습 설정 상세
-- [프로그램 비평 및 향후 방향](docs/프로그램비평.md)
-- [미션수행체크리스트](docs/미션수행체크리스트.md) · [제출증빙자료](docs/제출증빙자료.md)
 
 ### 검증 증거
 - [API](evidence/api-check.json) · [Agent](evidence/agent-check.json) · [RAG](evidence/rag-check.json) · [생성형 AI](evidence/llm-check.json)
@@ -284,7 +282,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 
 - 생성형 응답이 감정 라벨·출처 카드만 참조하므로 개별 상황 묘사의 구체성은 낮습니다.
 - 추론형 모델을 쓰고 있어 코치 문장 생성에 약 12초가 걸립니다.
-- 무료 Space는 영구 디스크가 없어 재시작 시 SQLite의 선호 기억과 기존 피드백 데이터가 초기화됩니다. Google Sheets 앱 평가와 브라우저의 일기·기록 그래프는 영향을 받지 않습니다.
+- 무료 Space는 영구 디스크가 없어 재시작 시 SQLite의 선호 기억과 과거 피드백 API 데이터가 초기화될 수 있습니다. Google Sheets 앱 평가와 브라우저의 일기·기록 그래프는 영향을 받지 않습니다.
 - 기록이 기기별로 분리됩니다. 폰과 PC의 그래프는 서로 다릅니다.
 - 위치 기반 추천(러닝 코스·근처 장소)은 권한·지도 API 검토 후 2단계입니다.
 - 초기에 Hugging Face 측 CPU 쿼터 오류로 기동이 막혀, 그동안 임시 HTTPS 경로로 시연·테스트했습니다. 현재는 해제되어 위 주소가 상시 동작합니다.

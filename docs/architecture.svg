@@ -42,7 +42,7 @@
   <rect class="box" x="730" y="178" width="210" height="50" fill="#E6EFE4" stroke="#A8C3A0"/>
   <text x="835" y="196" class="t" text-anchor="middle">localStorage</text>
   <text x="835" y="211" class="s" text-anchor="middle">일기 원문 · 확정 감정 (기기 보관)</text>
-  <text x="835" y="224" class="m" text-anchor="middle">서버·LLM 어디에도 전송하지 않음</text>
+  <text x="835" y="224" class="m" text-anchor="middle">분석 때 서버 전송 · DB 미저장</text>
 
   <!-- 3. API -->
   <rect class="band" x="30" y="258" width="1000" height="96"/>
@@ -60,7 +60,7 @@
   <text x="712" y="308" class="tn" text-anchor="middle">/api/memory/*</text>
   <text x="712" y="324" class="s" text-anchor="middle">선호 저장 · 조회 · 삭제</text>
   <rect class="box" x="812" y="288" width="188" height="52" fill="#E8EEF8" stroke="#9FB6D9"/>
-  <text x="906" y="308" class="tn" text-anchor="middle">/api/feedback · health · llm/status</text>
+  <text x="906" y="308" class="tn" text-anchor="middle">/api/app-rating · health · llm/status</text>
   <text x="906" y="324" class="s" text-anchor="middle">앱 평가 · 상태 공개</text>
 
   <!-- 4. AGENT -->
@@ -94,8 +94,8 @@
   <text x="789" y="457" class="s" text-anchor="middle">출처 링크 카드</text>
 
   <rect class="box" x="866" y="400" width="134" height="78" fill="#FBEAE4" stroke="#F2A08A"/>
-  <text x="933" y="424" class="tn" text-anchor="middle">save_user_feedback</text>
-  <text x="933" y="442" class="s" text-anchor="middle">평가 3항목 1~5</text>
+  <text x="933" y="424" class="tn" text-anchor="middle">앱 평가 별도 경로</text>
+  <text x="933" y="442" class="s" text-anchor="middle">Agent 밖에서 전달</text>
   <text x="933" y="457" class="s" text-anchor="middle">미동의 시 미저장</text>
 
   <!-- 5. DATA / MODEL -->
@@ -162,6 +162,6 @@
   <path class="link dashed" d="M 720 610 L 675 662"/>
 
   <text x="30" y="732" class="m">실선: 요청 흐름 · 점선: 근거 참조 및 배포 | 굵은 주황 테두리 = 생성형 AI 경로</text>
-  <text x="30" y="750" class="m">개인정보 경계: 일기 원문은 ② 계층을 벗어나지 않는다. ⑤의 생성형 AI에는 감정 라벨·스트레스·출처 카드만 전달된다.</text>
+  <text x="30" y="750" class="m">개인정보 경계: 일반 코치 AI에는 원문을 보내지 않는다. 동의한 정리·보고서 초안만 외부 AI에 원문을 전달할 수 있다.</text>
   <text x="30" y="768" class="m">생성 실패·안전 필터 탈락 시 규칙 기반 문장으로 자동 폴백하며, 응답의 generation 필드로 어느 경로인지 항상 공개한다.</text>
 </svg>

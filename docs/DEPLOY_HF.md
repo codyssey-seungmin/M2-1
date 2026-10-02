@@ -94,7 +94,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 ## 알아둘 점
 
 ### 데이터 저장 위치가 나뉩니다
-무료 등급 Space는 영구 디스크가 없어 **재시작하면 SQLite의 선호 기억과 기존 피드백 데이터가 초기화**될 수 있습니다. 현재 앱 평가 화면의 응답은 외부 Google Sheets에 저장되므로 Space 재시작의 영향을 받지 않습니다. 일기와 기록은 각 사용자 브라우저에 저장됩니다.
+무료 등급 Space는 영구 디스크가 없어 **재시작하면 SQLite의 선호 기억과 과거 피드백 API 데이터가 초기화**될 수 있습니다. 현재 앱 평가 화면의 응답은 외부 Google Sheets에 저장되므로 Space 재시작의 영향을 받지 않습니다. 일기와 기록은 각 사용자 브라우저에 저장됩니다.
 
 Google Sheets는 필요한 팀원에게만 공유하고, 과제 평가·분석이 끝나면 정한 보존 기준에 따라 정리합니다. 기존 SQLite 집계를 사용하는 경우에만 재시작 전에 별도로 내려받습니다.
 
@@ -107,5 +107,4 @@ Google Sheets는 필요한 팀원에게만 공유하고, 과제 평가·분석�
 | 파일 | 이유 |
 |---|---|
 | `render.yaml` | 유료 플랜 전제, HF Spaces로 대체 |
-| `START_QUICK_TUNNEL.cmd`, `docs/QUICK_TUNNEL.md` | 임시 터널은 영구 URL 확보로 불필요 |
 | `.openai/hosting.json` | 정적 호스팅 설정, 현재 구조와 무관 |
