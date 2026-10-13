@@ -9,7 +9,7 @@
 | 🌐 **서비스 열기** | **https://yellowmug-mindily.hf.space** · [Space 관리](https://huggingface.co/spaces/yellowmug/mindily) |
 | 📄 **결과보고서** | [docs/결과보고서.md](docs/결과보고서.md) |
 | 📊 **발표자료** | [docs/presentation.pdf](docs/presentation.pdf) · [편집용 .pptx](docs/presentation.pptx) |
-| 🎬 **시연 영상** | [docs/mindily-demo-3min.mp4](docs/mindily-demo-3min.mp4) · 3분 01초 |
+| 🎬 **시연 영상** | [docs/mindily-demo-3min.mp4](docs/mindily-demo-3min.mp4) · 2분 59.6초 |
 
 ---
 
