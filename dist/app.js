@@ -181,7 +181,8 @@ async function analyzeDiary(text, stress) {
   const analysis = data.analysis;
   return {id: crypto.randomUUID(), ranked: analysis.labels.map(x => ({name:x.name, score:x.score})),
     model: analysis.model, revision: analysis.revision, chunks: analysis.chunks,
-    agentMessage: data.message, recommendation: data.recommendation, comfort: data.comfort,
+    agentMessage: data.message, responseType: data.response_type,
+    recommendation: data.recommendation, comfort: data.comfort,
     stress, text, tags: [...selectedTags], date: new Date().toISOString(),
     detailedMood: null, confirmedMood: null};
 }
@@ -285,6 +286,11 @@ function renderAnalysis() {
   };
   document.getElementById('analysis-message').textContent = lastAnalysis.agentMessage || messages[lead];
   renderComfort(lastAnalysis.comfort);
+  const generationNote = document.getElementById('coach-generation-note');
+  generationNote.hidden = false;
+  generationNote.textContent = lastAnalysis.responseType === 'llm_grounded'
+    ? 'AI가 출처를 바탕으로 생성한 문장이며 의료적 진단이 아니에요.'
+    : '연결 상태에 따라 규칙 기반 문장으로 제공됐어요.';
   updateMoodUI();
   updateRecordUI(lastAnalysis);
 }
