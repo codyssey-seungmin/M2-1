@@ -14,7 +14,7 @@
 | ② 프론트엔드 | `dist/index.html`, `app.js`, `styles.css`, `manifest.webmanifest`, `sw.js`, localStorage | 화면 렌더링, API 호출, **일기 원문 기기 보관**, 수정 가능한 개인 문구·정리 초안·사건 요약 저장, 기록 그래프·보고서 계산, 바람 소리 합성 및 빗소리·파도 음원 재생 |
 | ③ API | `server.py` (FastAPI + Uvicorn) | 요청 검증, 라우팅, 상태 공개 |
 | ④ Agent | `coach_agent.py` | 의도 판별 후 도구를 순서대로 호출 |
-| ⑤ 모델·지식·저장 | KcELECTRA, `llm.py`, `diary_draft.py`, `rag.py`, `healing_knowledge.py`, `memory_db.py`, Google Apps Script·Google Sheets | 분류 추론, 출처 접지 코칭, 동의 기반 일기 초안·사건 요약 생성, 선호 기억·앱 평가 저장 |
+| ⑤ 모델·지식·저장 | KcELECTRA, `llm.py`, `diary_draft.py`, `rag.py`, `knowledge/healing_sources.json`, `memory_db.py`, Google Apps Script·Google Sheets | BM25 근거 검색, 출처 접지 코칭, 동의 기반 일기 초안·사건 요약 생성, 선호 기억·앱 평가 저장 |
 | ⑥ 배포 | Dockerfile → Hugging Face Spaces, GitHub `main` | 영구 HTTPS URL 제공, 이력 관리 |
 
 ---
@@ -26,13 +26,15 @@
 ```
 사용자 일기 입력 + 스트레스 1~5
   → POST /api/agent/coach
-  → coach_agent: 의도 = "일기"
+  → safety.py: 명시적 위기 표현 확인
+      ├─ 위기 신호 있음 → 109·112·119 안내, 아래 일반 흐름 중단
+      └─ 위기 신호 없음 → coach_agent: 의도 = "일기"
       ├─ analyze_emotion(text, stress)
       │     → KcELECTRA 추론 → 6개 감정 점수 → 무드 미터 좌표
-      ├─ retrieve_grounding(emotion, stress)
-      │     → healing_knowledge 검색 → 출처 카드 3장
-      ├─ generate_coach_message(emotion, stress, sources)   ← 생성형 AI
-      │     → 출처 카드만 컨텍스트로 전달 (일기 원문 미전송)
+      ├─ retrieve_grounding(emotion, stress, preferred_kind)
+      │     → 별도 지식 문서 BM25 검색 → 상위 근거 3건
+      ├─ generate_coach_message(emotion, stress, sources, preferred_kind)
+      │     → 검색 근거와 동의한 선호만 전달 (일기 원문 미전송)
       │     → 안전 검사 통과 시 채택, 실패 시 규칙 기반 폴백
       └─ recommend_healing(emotion, stress, 선호)
             → 출처 링크가 붙은 추천 카드
@@ -59,7 +61,7 @@ generate_coach_message ┼─ 호출 실패  → deterministic_fallback (call_fa
 [동의 X] 저장하지 않음 — 기능은 그대로 사용 가능
 앱 평가 3항목·개선 의견 → POST /api/app-rating → Google Apps Script → Google Sheets
 브라우저별 참여 코드 → 반복 평가 묶음 / 제출별 ID → 재전송 중복 방지
-다음 방문 → POST /api/memory/read → 30일 이내 선호만 추천 가중치에 반영
+다음 방문 → POST /api/memory/read → 30일 이내 선호를 RAG 검색 가중치와 생성형 AI 입력에 반영
 ```
 
 ---
@@ -139,6 +141,7 @@ Agent 실행 추적에도 **도구 이름만** 기록합니다.
 | ⑤ RAG | `test_rag.py`, `evidence/rag-check.json` |
 | ⑤ **생성형 AI** | `test_llm.py`, `evidence/llm-check.json` |
 | ⑤ Memory | `test_memory_restart.py`, `evidence/memory-retention-check.json` |
+| ③ 위기 안전 분기 | `test_safety.py`, `evidence/safety-check.json` |
 | ⑤ 기존 Feedback API | `test_feedback.py` |
 | ⑤ Google Sheets 앱 평가 | `docs/GOOGLE_SHEETS_SURVEY.md`, `docs/google_sheets_receiver.gs` |
 | ⑥ 패키징 | `test_packaging.py` |

@@ -1,0 +1,22 @@
+{
+  "checked_on": "2026-10-23",
+  "scope": "local FastAPI crisis-route test with synthetic phrases",
+  "verified_contacts": {
+    "109": "24-hour suicide prevention counseling",
+    "112": "police emergency",
+    "119": "fire and emergency medical response"
+  },
+  "official_source": "https://www.mohw.go.kr/board.es?act=view&bid=0027&list_no=1479607&mid=a10503010300",
+  "checks": [
+    "explicit crisis phrases route to the safety response",
+    "ordinary difficult-day and prevention-education phrases do not trigger",
+    "emotion analysis, recommendation and grounded generation are not called after a crisis match",
+    "the response contains 109, 112 and 119",
+    "the response declares no separate storage and no external AI transfer"
+  ],
+  "verification": "python test_safety.py",
+  "limits": [
+    "This is a conservative keyword safety route, not a diagnosis or complete risk assessment",
+    "False negatives remain possible; the general safety notice is therefore always visible"
+  ]
+}

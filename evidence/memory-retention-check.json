@@ -1,23 +1,23 @@
 {
-  "checked_on": "2026-09-19",
-  "data_type": "synthetic preference only",
-  "local_test": "python test_memory_restart.py",
-  "local_results": [
-    "preference survived a new process",
-    "SQLite stored a hash rather than the raw token",
-    "explicit deletion removed the preference",
-    "a preference older than 30 days was not returned and was purged"
+  "checked_on": "2026-10-23",
+  "data_type": "synthetic activity preference only",
+  "checks": [
+    "preference survives a new process",
+    "SQLite stores a SHA-256 token hash rather than the raw browser token",
+    "explicit deletion removes the preference",
+    "a preference older than 30 days is not returned and is purged",
+    "an opted-in walking preference moves the walking source to the first BM25 result",
+    "the same preference is included in the grounded generative prompt",
+    "without a stored preference the ordinary retrieval path remains available"
   ],
-  "temporary_https_results": {
-    "saved": true,
-    "remembered": "걷기",
-    "deleted": true,
-    "after_delete": null
-  },
+  "verification": [
+    "python test_memory_restart.py",
+    "python test_healing.py"
+  ],
   "limits": [
     "Expired entries are purged on the next memory request, not by a background timer",
     "A lost browser token cannot immediately delete its old server record",
-    "Quick Tunnel does not prove permanent hosted persistence",
-    "No real participant data was used"
+    "Free Hugging Face Space restarts can reset SQLite unless persistent storage is added",
+    "No diary text, location or real participant data was used"
   ]
 }

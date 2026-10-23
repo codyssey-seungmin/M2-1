@@ -49,14 +49,14 @@
 
 ---
 
-## 필수 기술 요소 — 요구 2개, 구현 4개
+## 필수 기술 요소 — RAG + Long-term Memory
 
-| 요소 | 구현 | 검증 |
+| 필수 요소 | 구현 | 검증 |
 |---|---|---|
-| **AI Agent** | `coach_agent.py` — 의도 판별 후 도구 순차 호출 | [`agent-check.json`](evidence/agent-check.json) |
-| **RAG** | `rag.py` · `healing_knowledge.py` — 근거 검색·출처 부착 | [`rag-check.json`](evidence/rag-check.json) |
-| **생성형 AI** | `llm.py` — 출처 접지 생성, 안전 필터, 자동 폴백 | [`llm-check.json`](evidence/llm-check.json) |
-| **Long-term Memory** | `memory_db.py` — 동의 저장, 30일 만료·삭제 | [`memory-retention-check.json`](evidence/memory-retention-check.json) |
+| **RAG** | `knowledge/healing_sources.json`을 별도 지식 말뭉치로 두고 `rag.py`가 BM25로 상위 근거 3건을 검색해 출처와 함께 생성형 AI에 전달 | [`rag-check.json`](evidence/rag-check.json) |
+| **Long-term Memory** | `memory_db.py`가 동의한 활동 선호만 30일 저장하고, 다음 요청에서 RAG 검색 가중치와 생성형 AI 입력에 함께 반영 | [`memory-retention-check.json`](evidence/memory-retention-check.json) |
+
+생성형 AI는 과제의 기본 요건이자 코치 문장 생성 계층이며, `coach_agent.py`는 실행 순서를 조정하는 보조 오케스트레이션입니다. 필수 기술 요소 개수에는 이 둘을 중복해 세지 않습니다. Must 기능 M-05 한 흐름에서 **RAG 검색과 Long-term Memory 개인화가 결합**됩니다.
 
 ---
 
@@ -89,6 +89,8 @@
 | 입력 | 일반 코치 문장에는 검색된 출처 카드 3장만 전달. **일기 원문은 보내지 않음**. 정리·보고서 초안은 별도 동의 후에만 원문을 사용 |
 | 지시 | 카드 밖 활동 생성 금지 · 진단/처방/병원 권유 금지 · 감정 단정 금지 |
 | 출력 | 금지어 검출 시 문장을 폐기하고 규칙 기반으로 폴백 |
+
+명시적인 자해·자살 위기 표현은 위 세 단계보다 먼저 `safety.py`에서 확인합니다. 탐지되면 감정 분석·추천·RAG·생성형 AI를 호출하지 않고 보건복지부의 24시간 [자살예방상담전화 **109**](https://www.mohw.go.kr/board.es?act=view&bid=0027&list_no=1479607&mid=a10503010300), 긴급 상황의 **112·119** 안내를 우선 표시합니다. 해당 입력은 별도 서버 저장소에 남기지 않습니다.
 
 모든 응답은 어느 경로로 만들어졌는지 스스로 밝힙니다.
 
@@ -264,7 +266,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 - [모델 적용 결과](docs/모델적용결과.md) — 실제 분류 결과·추가 학습 측정값·채택 판단
 
 ### 검증 증거
-- [API](evidence/api-check.json) · [Agent](evidence/agent-check.json) · [RAG](evidence/rag-check.json) · [생성형 AI](evidence/llm-check.json)
+- [API](evidence/api-check.json) · [Agent](evidence/agent-check.json) · [RAG](evidence/rag-check.json) · [생성형 AI](evidence/llm-check.json) · [위기 안전 분기](evidence/safety-check.json)
 - [배포 환경 실측](evidence/deploy-check.json) — 상태·생성 경로·실제 응답 문장·도구 추적
 - [선호 기억 유지·만료](evidence/memory-retention-check.json) · [확장 추천 카드](evidence/extension-recommendations-check.json)
 - [학습 데이터 전수 통계](evidence/training-data-audit.json) · [파일럿 추가 학습](evidence/team-motion-training.json)

@@ -18,7 +18,7 @@
 
   <rect width="1060" height="810" fill="#FBF8F2"/>
   <text x="30" y="38" font-size="21" font-weight="700" fill="#1F2A44">Mindily 시스템 아키텍처</text>
-  <text x="30" y="58" class="s" font-size="12">감정 일기 → KcELECTRA 분석 → Agent 도구 호출 → 출처 접지 생성형 응답 → 동의 기반 선호 기억 · Google Sheets 앱 평가</text>
+  <text x="30" y="58" class="s" font-size="12">위기 표현 우선 분기 → 감정 분석 → BM25 근거 검색 + 선호 기억 → 출처 접지 생성형 응답</text>
 
   <!-- 1. USER -->
   <rect class="band" x="30" y="76" width="1000" height="58"/>
@@ -52,7 +52,7 @@
   <text x="148" y="324" class="s" text-anchor="middle">감정 분류 · 긴 글 청크</text>
   <rect class="box" x="248" y="288" width="176" height="52" fill="#E8EEF8" stroke="#9FB6D9"/>
   <text x="336" y="308" class="tn" text-anchor="middle">/api/agent/coach</text>
-  <text x="336" y="324" class="s" text-anchor="middle">의도 판별 → 도구 호출</text>
+  <text x="336" y="324" class="s" text-anchor="middle">안전 분기 → 제한 실행</text>
   <rect class="box" x="436" y="288" width="176" height="52" fill="#E8EEF8" stroke="#9FB6D9"/>
   <text x="524" y="308" class="tn" text-anchor="middle">/api/rag/search · answer</text>
   <text x="524" y="324" class="s" text-anchor="middle">근거 검색 · 출처 접지 생성</text>
@@ -65,7 +65,7 @@
 
   <!-- 4. AGENT -->
   <rect class="band" x="30" y="370" width="1000" height="122"/>
-  <text x="46" y="390" class="bandlabel">④ AI Agent 계층 · coach_agent.py — 의도에 따라 필요한 도구만 순서대로 호출</text>
+  <text x="46" y="390" class="bandlabel">④ 제한된 코치 오케스트레이션 · coach_agent.py — 정해진 도구를 순서대로 호출</text>
   <rect class="box" x="60" y="400" width="196" height="78" fill="#FBEAE4" stroke="#F2A08A"/>
   <text x="158" y="422" class="t" text-anchor="middle">의도 판별</text>
   <text x="158" y="440" class="s" text-anchor="middle">일기인가 / 대화인가</text>
@@ -79,8 +79,8 @@
 
   <rect class="box" x="434" y="400" width="134" height="78" fill="#FBEAE4" stroke="#F2A08A"/>
   <text x="501" y="424" class="tn" text-anchor="middle">retrieve_grounding</text>
-  <text x="501" y="442" class="s" text-anchor="middle">출처 카드 검색</text>
-  <text x="501" y="457" class="s" text-anchor="middle">RAG</text>
+  <text x="501" y="442" class="s" text-anchor="middle">BM25 상위 근거 검색</text>
+  <text x="501" y="457" class="s" text-anchor="middle">RAG + 선호 가중치</text>
 
   <rect class="box" x="578" y="400" width="134" height="78" fill="#F6DFD6" stroke="#E07A55" stroke-width="2.2"/>
   <text x="645" y="422" class="tn" text-anchor="middle">generate_</text>
@@ -114,8 +114,8 @@
 
   <rect class="box" x="440" y="538" width="180" height="70" fill="#E6EFE4" stroke="#A8C3A0"/>
   <text x="530" y="560" class="t" text-anchor="middle">RAG 지식베이스</text>
-  <text x="530" y="576" class="s" text-anchor="middle">healing_knowledge.py</text>
-  <text x="530" y="591" class="m" text-anchor="middle">출처·라이선스·갱신일</text>
+  <text x="530" y="576" class="s" text-anchor="middle">knowledge/healing_sources.json</text>
+  <text x="530" y="591" class="m" text-anchor="middle">BM25 · 출처 · 라이선스</text>
 
   <rect class="box" x="630" y="538" width="180" height="70" fill="#E6EFE4" stroke="#A8C3A0"/>
   <text x="720" y="560" class="t" text-anchor="middle">Long-term Memory</text>
@@ -157,6 +157,8 @@
   <path class="link" d="M 645 480 L 350 536"/>
   <path class="link dashed" d="M 645 480 L 510 536"/>
   <path class="link" d="M 789 480 L 720 536"/>
+  <path class="link dashed" d="M 700 536 L 530 480"/>
+  <path class="link dashed" d="M 730 536 L 665 480"/>
   <path class="link" d="M 933 480 L 910 536"/>
   <path class="link dashed" d="M 150 610 L 200 662"/>
   <path class="link dashed" d="M 720 610 L 675 662"/>
