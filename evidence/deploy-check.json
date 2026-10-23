@@ -1,6 +1,7 @@
 {
-  "measured_at": "2026-09-21T09:00:00+09:00",
-  "method": "배포 서버에 브라우저에서 직접 요청. 합성 문장을 사용했고 실사용자 데이터가 아님.",
+  "measured_at": "2026-10-23T22:07:47+09:00",
+  "deployment_commit": "175d5d4b13105e939029cc3016318fee7e4c0d7d",
+  "method": "배포 서버에 합성 입력과 가상 선호 토큰으로 직접 요청. 실사용자 데이터가 아니며 가상 선호는 확인 직후 삭제함.",
   "service_url": "https://yellowmug-mindily.hf.space",
   "space": "https://huggingface.co/spaces/yellowmug/mindily",
   "health": {
@@ -17,7 +18,7 @@
     "grounding_policy": "answer only from retrieved source cards",
     "last_error": null
   },
-  "coach_call": {
+  "previous_coach_call_2026_09_21": {
     "input": {
       "text": "내일 발표를 잘할 수 있을지 걱정돼요.",
       "self_reported_stress": 3,
@@ -38,6 +39,26 @@
       "generate_coach_message:completed"
     ]
   },
+  "latest_deployment_checks": {
+    "rag": {
+      "method": "bm25",
+      "top_source_id": "nhs-breathing"
+    },
+    "crisis_route": {
+      "response_type": "safety",
+      "generation": "not_run",
+      "contacts": ["109", "112", "119"],
+      "analysis_is_null": true
+    },
+    "memory_rag_generation": {
+      "synthetic_preference": "걷기",
+      "saved": true,
+      "personalization_applied": true,
+      "top_source_kind": "걷기",
+      "generation": "llm_grounded",
+      "deleted_after_check": true
+    }
+  },
   "static_assets": {
     "manifest.webmanifest": 200,
     "sw.js": 200,
@@ -46,6 +67,7 @@
   "notes": [
     "분류 점수는 확률 비율이 아니라 6개 라벨 softmax의 최댓값이다.",
     "생성 문장은 검색된 출처 카드에 있는 활동만 언급했고, 감정을 단정하지 않는 어미를 사용했다.",
-    "무료 Space는 48시간 미접속 시 절전하며, 재시작 시 서버의 만족도·선호 기억이 초기화된다."
+    "무료 Space는 절전 또는 재시작 시 SQLite 선호 기억이 초기화될 수 있다.",
+    "위기 분기는 감정 분석·RAG·생성형 AI 전에 실행되며 진단이나 완전한 위험도 평가가 아니다."
   ]
 }
