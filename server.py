@@ -26,6 +26,7 @@ from coach_agent import run_coach_agent
 from rag import answer_with_grounding, retrieve_activities, retrieve_grounding
 from comfort_knowledge import comfort_for
 from diary_draft import organizer_draft, report_events
+from safety import crisis_support, has_crisis_signal
 import llm
 
 MODEL = os.getenv('MINDILY_MODEL_PATH', 'GGARA02/kcelectra-korean-emotion')
@@ -81,7 +82,7 @@ class MemoryRequest(BaseModel):
 
 
 class MemorySave(MemoryRequest):
-    preferred_kind: str = Field(pattern='^(호흡|감각활동|걷기)$')
+    preferred_kind: str = Field(pattern='^(호흡|감각활동|자연의 소리|걷기)$')
     consent: bool
 
 
@@ -199,6 +200,21 @@ def rag_answer(request: HealingRequest):
 @app.post('/api/agent/coach')
 def coach(request: AgentRequest):
     """Route a diary or chat turn through the real model and sourced activity tool."""
+    if has_crisis_signal(request.text):
+        safety = crisis_support()
+        return {
+            'intent': 'safety',
+            'message': safety['message'],
+            'response_type': 'safety',
+            'generation': 'not_run',
+            'analysis': None,
+            'recommendation': None,
+            'grounding': None,
+            'comfort': None,
+            'tool_trace': [{'tool': 'crisis_safety', 'status': 'completed'}],
+            'disclaimer': 'Mindily는 위기 상담이나 의료적 진단을 대신하지 않아요.',
+            'safety': safety,
+        }
     result = run_coach_agent(
         request.text, request.self_reported_stress, request.context, request.memory_token,
         lambda text, stress: analyze(Diary(text=text, self_reported_stress=stress)),

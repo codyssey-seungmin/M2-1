@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Pretendard:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css?v=r20260922rating3">
+  <link rel="stylesheet" href="styles.css?v=r20261023safety1">
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="apple-touch-icon" href="apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -187,7 +187,7 @@
           <div class="message ai"><small>Mindily</small><p>그 장면이 계속 떠오르면 마음이 무거울 수 있겠어요. 지금은 그때 가장 아쉬웠던 한 가지만 이야기해도 괜찮아요.</p></div>
         </div>
         <form class="chat-composer" id="chat-form"><label><span class="sr-only">마음 친구에게 보내기</span><input id="chat-input" placeholder="지금 마음을 이야기해보세요…" autocomplete="off"></label><button type="submit" aria-label="보내기">↑</button></form>
-        <p class="chat-disclaimer">위기 상황에는 지역 응급기관이나 전문 상담기관에 연락해주세요.</p>
+        <p class="chat-disclaimer">마음이 위급할 때는 자살예방상담전화 109, 긴급 상황에는 112·119로 연락해주세요.</p>
       </section>
 
       <section class="screen" data-screen="records" aria-labelledby="records-heading">
@@ -353,11 +353,15 @@
   </dialog>
 
   <dialog id="safety-dialog" class="info-dialog">
-    <form method="dialog"><button class="icon-button" value="cancel" aria-label="닫기">×</button><span class="eyebrow">안전한 사용 안내</span><h2>Mindily는 마음을 정리하는 도구예요.</h2><p>감정 분석은 의료적 진단이 아니며, 중요한 판단을 대신하지 않아요. 스스로 또는 타인을 해칠 위험이 있거나 즉각적인 도움이 필요하면 지역 응급기관과 전문 상담기관에 연락해주세요.</p><button class="secondary-button" value="ok">확인했어요</button></form>
+    <form method="dialog"><button class="icon-button" value="cancel" aria-label="닫기">×</button><span class="eyebrow">안전한 사용 안내</span><h2>Mindily는 마음을 정리하는 도구예요.</h2><p>감정 분석은 의료적 진단이 아니며, 중요한 판단을 대신하지 않아요. 마음이 위급할 때는 자살예방상담전화 109, 자신이나 다른 사람을 해칠 즉각적인 위험이 있으면 112 또는 119로 연락해주세요.</p><button class="secondary-button" value="ok">확인했어요</button></form>
+  </dialog>
+
+  <dialog id="crisis-dialog" class="info-dialog crisis-dialog">
+    <form method="dialog"><button class="icon-button" value="cancel" aria-label="닫기">×</button><span class="eyebrow">지금은 안전이 먼저예요</span><h2>지금은 도움을 받아요.</h2><p>자살예방상담전화 <strong>109</strong>는 24시간 연결돼요. 당장 자신이나 다른 사람을 해칠 위험이 있으면 주변 사람에게 알리고 <strong>112 또는 119</strong>에 연락해 주세요.</p><div class="crisis-actions"><a class="primary-button" href="tel:109">109 상담전화 연결</a><a class="secondary-button" href="tel:112">112 긴급신고</a><a class="secondary-button" href="tel:119">119 구급신고</a></div><small class="model-note">Mindily는 위기 상담이나 의료적 진단을 대신하지 않아요.</small><button class="text-button" value="ok">닫기</button></form>
   </dialog>
 
   <div class="toast" role="status" aria-live="polite" id="toast"></div>
   <script src="event_groups.js?v=r20260920journeys3"></script>
-  <script src="app.js?v=r20260923rating5"></script>
+  <script src="app.js?v=r20261023safety1"></script>
 </body>
 </html>

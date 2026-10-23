@@ -36,6 +36,7 @@ copy /Y "%ROOT%coach_agent.py" "%TMP%\coach_agent.py" >nul
 copy /Y "%ROOT%rag.py" "%TMP%\rag.py" >nul
 copy /Y "%ROOT%llm.py" "%TMP%\llm.py" >nul
 copy /Y "%ROOT%diary_draft.py" "%TMP%\diary_draft.py" >nul
+copy /Y "%ROOT%safety.py" "%TMP%\safety.py" >nul
 copy /Y "%ROOT%feedback_db.py" "%TMP%\feedback_db.py" >nul
 copy /Y "%ROOT%healing_knowledge.py" "%TMP%\healing_knowledge.py" >nul
 copy /Y "%ROOT%memory_db.py" "%TMP%\memory_db.py" >nul

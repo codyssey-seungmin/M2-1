@@ -170,6 +170,11 @@ const emotionMeta = {
   불안: ['😰', '걱정되는'], 슬픔: ['😔', '지친'], 분노: ['😣', '답답한'], 기쁨: ['🙂', '기분 좋은'], 상처: ['🥺', '외로운'], 당황: ['😯', '초조한']
 };
 
+function showCrisisSupport() {
+  const dialog = document.getElementById('crisis-dialog');
+  if (dialog && !dialog.open) dialog.showModal();
+}
+
 async function analyzeDiary(text, stress) {
   const response = await fetch('/api/agent/coach', {
     method: 'POST', headers: {'Content-Type': 'application/json'},
@@ -178,6 +183,10 @@ async function analyzeDiary(text, stress) {
   });
   if (!response.ok) throw new Error('지금은 분석할 수 없어요. 잠시 후 다시 시도해주세요.');
   const data = await response.json();
+  if (data.safety?.triggered) {
+    showCrisisSupport();
+    return null;
+  }
   const analysis = data.analysis;
   return {id: crypto.randomUUID(), ranked: analysis.labels.map(x => ({name:x.name, score:x.score})),
     model: analysis.model, revision: analysis.revision, chunks: analysis.chunks,
@@ -197,6 +206,7 @@ document.getElementById('diary-form').addEventListener('submit', async (event) =
   button.disabled = true; button.textContent = '마음을 읽고 있어요…';
   try {
     lastAnalysis = await analyzeDiary(text, stress);
+    if (!lastAnalysis) return;
     selectedMood = {name:'직접 골라주세요', color:'#b7bfce'};
     document.querySelectorAll('[data-mood]').forEach(x => x.classList.remove('selected'));
     renderAnalysis(); saveEntry(lastAnalysis); renderChart(); showScreen('analysis');
@@ -766,6 +776,12 @@ document.getElementById('chat-form').addEventListener('submit', async (event) =>
       signal: AbortSignal.timeout(60000)});
     if (!response.ok) throw new Error('coach');
     const result = await response.json();
+    if (result.safety?.triggered) {
+      thread.insertAdjacentHTML('beforeend', `<div class="message ai crisis-message"><small>Mindily · 안전 안내</small><p>${escapeHtml(result.message)}</p><p class="crisis-links"><a href="tel:109">109 상담</a><a href="tel:112">112</a><a href="tel:119">119</a></p></div>`);
+      showCrisisSupport();
+      thread.parentElement.scrollTo({ top: thread.parentElement.scrollHeight, behavior: 'smooth' });
+      return;
+    }
     const card = result.recommendation?.cards?.[0];
     const source = card?.source_url?.startsWith('https://')
       ? `<p><a href="${escapeHtml(card.source_url)}" target="_blank" rel="noopener noreferrer">${escapeHtml(card.source_title)} 자료 보기 ↗</a></p>` : '';

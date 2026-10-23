@@ -38,5 +38,12 @@ with tempfile.TemporaryDirectory() as directory:
     assert '사용자가 저장에 동의한 선호 활동: 걷기' in prompt
     assert client.post('/api/memory/delete', json={'token': token}).json()['deleted']
     assert client.post('/api/memory/read', json={'token': token}).json()['preferred_kind'] is None
+    sound_saved = client.post('/api/memory', json={
+        'token': token, 'preferred_kind': '자연의 소리', 'consent': True})
+    assert sound_saved.status_code == 200
+    sound_tailored = client.post('/api/healing/recommend', json={
+        **payload, 'memory_token': token}).json()
+    assert sound_tailored['cards'][0]['kind'] == '자연의 소리'
+    assert client.post('/api/memory/delete', json={'token': token}).json()['deleted']
 
 print('retrieval, consent and memory deletion: OK')
