@@ -24,6 +24,7 @@ echo "▶ 배포에 필요한 파일만 복사합니다."
 cp Dockerfile requirements.txt "$TMP/space/"
 cp server.py coach_agent.py rag.py llm.py diary_draft.py \
    feedback_db.py healing_knowledge.py memory_db.py "$TMP/space/"
+rm -rf "$TMP/space/knowledge" && cp -r knowledge "$TMP/space/knowledge"
 rm -rf "$TMP/space/dist" && cp -r dist "$TMP/space/dist"
 
 # Space의 README.md는 YAML 프런트매터가 필요하므로 전용 파일을 사용한다.

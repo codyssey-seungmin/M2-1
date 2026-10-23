@@ -34,4 +34,6 @@ while pending:
                 pending.append(local_file)
 
 assert (root / 'dist' / 'index.html').exists() and 'dist ./dist' in dockerfile
+assert (root / 'knowledge' / 'healing_sources.json').exists()
+assert 'knowledge ./knowledge' in dockerfile, 'Dockerfile must copy the RAG knowledge corpus'
 print('Docker source copy covers local server imports and UI: OK')

@@ -17,7 +17,8 @@ def analyze(text, stress):
 def recommend(emotion, stress, token):
     calls.append('recommend_healing')
     assert emotion in {'불안', '미상'} and stress == 4 and token is None
-    return {'cards': [{'title': '1분 호흡하기', 'source_url': 'https://www.nhs.uk/example'}]}
+    return {'cards': [{'title': '1분 호흡하기', 'source_url': 'https://www.nhs.uk/example'}],
+            'preferred_kind': None}
 
 
 diary_text = '내일 발표가 걱정돼요.'

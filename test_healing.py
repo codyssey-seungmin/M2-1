@@ -27,6 +27,15 @@ with tempfile.TemporaryDirectory() as directory:
     assert client.post('/api/memory/read', json={'token': token}).json()['preferred_kind'] == '걷기'
     tailored = client.post('/api/healing/recommend', json={**payload, 'memory_token': token}).json()
     assert tailored['personalized'] and tailored['cards'][0]['kind'] == '걷기'
+    assert tailored['preferred_kind'] == '걷기'
+    assert tailored['cards'][0]['retrieval']['preference_boosted'] is True
+    grounded = client.post('/api/rag/answer', json={**payload, 'memory_token': token}).json()
+    assert grounded['personalization'] == {'applied': True, 'preferred_kind': '걷기'}
+    assert grounded['sources'][0]['kind'] == '걷기'
+    assert grounded['sources'][0]['retrieval']['preference_boosted'] is True
+    prompt = __import__('llm')._build_user_prompt(
+        '불안', 4, grounded['sources'], preferred_kind='걷기')
+    assert '사용자가 저장에 동의한 선호 활동: 걷기' in prompt
     assert client.post('/api/memory/delete', json={'token': token}).json()['deleted']
     assert client.post('/api/memory/read', json={'token': token}).json()['preferred_kind'] is None
 

@@ -21,10 +21,9 @@ mimetypes.add_type('application/manifest+json', '.webmanifest')
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional
 from feedback_db import save_feedback
-from healing_knowledge import retrieve_activities
 from memory_db import remember, recall, forget
 from coach_agent import run_coach_agent
-from rag import answer_with_grounding, retrieve_grounding
+from rag import answer_with_grounding, retrieve_activities, retrieve_grounding
 from comfort_knowledge import comfort_for
 from diary_draft import organizer_draft, report_events
 import llm
@@ -169,29 +168,32 @@ def analyze(diary: Diary):
 @app.post('/api/healing/recommend')
 def recommend_healing(request: HealingRequest):
     """Retrieve sourced activities; location lookup is not implemented yet."""
-    cards = retrieve_activities(request.emotion, request.stress, request.minutes)
     preferred = recall(request.memory_token) if request.memory_token else None
-    if preferred:
-        cards.sort(key=lambda card: card['kind'] == preferred, reverse=True)
+    cards = retrieve_activities(
+        request.emotion, request.stress, request.minutes, preferred)
     return {'tool': 'recommend_healing', 'emotion': request.emotion,
             'stress': request.stress, 'cards': cards,
-            'location_available': False, 'personalized': bool(preferred)}
+            'location_available': False, 'personalized': bool(preferred),
+            'preferred_kind': preferred}
 
 
 @app.post('/api/rag/search')
 def rag_search(request: HealingRequest):
     """Return source chunks selected for a grounded response."""
+    preferred = recall(request.memory_token) if request.memory_token else None
     return {'tool': 'retrieve_grounding', 'emotion': request.emotion,
             'stress': request.stress, 'sources': retrieve_grounding(
-                request.emotion, request.stress, request.minutes)}
+                request.emotion, request.stress, request.minutes, preferred),
+            'personalized': bool(preferred), 'preferred_kind': preferred}
 
 
 @app.post('/api/rag/answer')
 def rag_answer(request: HealingRequest):
     """Return a grounded fallback answer and its source context."""
+    preferred = recall(request.memory_token) if request.memory_token else None
     return {'tool': 'rag_answer', 'emotion': request.emotion,
             'stress': request.stress, **answer_with_grounding(
-                request.emotion, request.stress, request.minutes)}
+                request.emotion, request.stress, request.minutes, preferred)}
 
 
 @app.post('/api/agent/coach')
@@ -203,7 +205,8 @@ def coach(request: AgentRequest):
         lambda emotion, stress, token: recommend_healing(
             HealingRequest(emotion=emotion, stress=stress, minutes=20, memory_token=token)),
         request.known_emotion,
-        lambda emotion, stress: answer_with_grounding(emotion, stress, minutes=20),
+        lambda emotion, stress, preferred: answer_with_grounding(
+            emotion, stress, minutes=20, preferred_kind=preferred),
     )
     analysis = result.get('analysis')
     lead = analysis['labels'][0]['name'] if analysis else (request.known_emotion or '불안')

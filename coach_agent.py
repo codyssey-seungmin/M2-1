@@ -61,8 +61,9 @@ def run_coach_agent(text, stress, context, memory_token, analyze_tool, recommend
         trace.append({'tool': 'recommend_healing', 'status': 'completed'})
 
     grounding = None
+    preferred_kind = (recommendation or {}).get('preferred_kind')
     if recommendation and grounding_tool:
-        grounding = grounding_tool(emotion, stress)
+        grounding = grounding_tool(emotion, stress, preferred_kind)
         trace.append({'tool': 'retrieve_grounding', 'status': 'completed'})
 
     # 생성형 경로가 성공했을 때만 그 문장을 쓰고, 아니면 규칙 기반으로 되돌린다.

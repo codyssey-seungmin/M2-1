@@ -40,6 +40,8 @@ copy /Y "%ROOT%feedback_db.py" "%TMP%\feedback_db.py" >nul
 copy /Y "%ROOT%healing_knowledge.py" "%TMP%\healing_knowledge.py" >nul
 copy /Y "%ROOT%memory_db.py" "%TMP%\memory_db.py" >nul
 copy /Y "%ROOT%SPACE_README.md" "%TMP%\README.md" >nul
+if exist "%TMP%\knowledge" rmdir /S /Q "%TMP%\knowledge"
+xcopy "%ROOT%knowledge" "%TMP%\knowledge" /E /I /Y >nul
 if exist "%TMP%\dist" rmdir /S /Q "%TMP%\dist"
 xcopy "%ROOT%dist" "%TMP%\dist" /E /I /Y >nul
 

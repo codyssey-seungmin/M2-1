@@ -71,12 +71,17 @@ def status() -> dict:
     }
 
 
-def _build_user_prompt(emotion: str, stress: int, sources: list[dict]) -> str:
+def _build_user_prompt(emotion: str, stress: int, sources: list[dict],
+                       preferred_kind: str | None = None) -> str:
     lines = [f'- {s["title"]} ({s["kind"]}): {s["description"]} [출처: {s["source_title"]}]'
              for s in sources[:3]]
+    preference = (f'사용자가 저장에 동의한 선호 활동: {preferred_kind}\n'
+                  if preferred_kind else '저장된 선호 활동: 없음\n')
     return (f'분류 모델이 추정한 감정: {emotion}\n'
             f'사용자가 직접 보고한 스트레스: {stress}/5\n'
+            f'{preference}'
             f'출처 카드:\n' + '\n'.join(lines) + '\n\n'
+            '선호 활동이 있으면 출처 카드 안에서만 자연스럽게 우선 고려한다. '
             '위 조건으로 코치 문장을 써라. 설명 없이 문장만 출력한다.')
 
 
@@ -103,7 +108,8 @@ def _payload(model: str, messages: list[dict], reasoning: bool, effort: str | No
     return body
 
 
-def generate_coach_message(emotion: str, stress: int, sources: list[dict]) -> dict | None:
+def generate_coach_message(emotion: str, stress: int, sources: list[dict],
+                           preferred_kind: str | None = None) -> dict | None:
     """출처 기반 코치 문장을 생성한다. 불가·부적합하면 None을 반환해 폴백을 유도한다."""
     if not is_enabled() or not sources:
         return None
@@ -112,7 +118,8 @@ def generate_coach_message(emotion: str, stress: int, sources: list[dict]) -> di
     timeout = float(os.getenv('MINDILY_LLM_TIMEOUT', '20'))
     messages = [
         {'role': 'system', 'content': SYSTEM_RULES},
-        {'role': 'user', 'content': _build_user_prompt(emotion, stress, sources)},
+        {'role': 'user', 'content': _build_user_prompt(
+            emotion, stress, sources, preferred_kind)},
     ]
     reasoning = model.lower().startswith(REASONING_PREFIXES)
     # 맞는 규격을 먼저 시도하고, 거절당하거나 본문이 비면 다음 후보로 넘어간다.
