@@ -8,7 +8,7 @@
 |---|---|
 | 🌐 **서비스 열기** | **https://yellowmug-mindily.hf.space** · [Space 관리](https://huggingface.co/spaces/yellowmug/mindily) |
 | 📄 **결과보고서** | [docs/결과보고서.md](docs/결과보고서.md) |
-| 📊 **발표자료** | [docs/presentation.pdf](docs/presentation.pdf) · [편집용 .pptx](docs/presentation.pptx) |
+| 📊 **발표자료** | [docs/presentation-final.pdf](docs/presentation-final.pdf) · [편집용 .pptx](docs/presentation-final.pptx) |
 | 🎬 **시연 영상** | [docs/mindily-demo-3min.mp4](docs/mindily-demo-3min.mp4) · 2분 59.6초 |
 
 ---
@@ -259,7 +259,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 - [결과보고서](docs/결과보고서.md) — 평가 항목별 구현 결과
 - [기능명세서](docs/기능명세서.md) — 기능·비기능 요구사항
 - [시스템 아키텍처](docs/architecture.md) — 계층 구조와 설계 근거
-- [발표자료](docs/presentation.pdf) · [편집용 PPTX](docs/presentation.pptx) · [시연 영상](docs/mindily-demo-3min.mp4)
+- [발표자료](docs/presentation-final.pdf) · [편집용 PPTX](docs/presentation-final.pptx) · [시연 영상](docs/mindily-demo-3min.mp4)
 - [팀 역할 및 기여 기록](docs/TEAM_ROLES.md)
 
 ### 기록·분석
@@ -282,7 +282,7 @@ curl https://yellowmug-mindily.hf.space/api/llm/status
 
 ## 현재 한계
 
-- 생성형 응답이 감정 라벨·출처 카드만 참조하므로 개별 상황 묘사의 구체성은 낮습니다.
+- 일반 코치 생성형 응답은 감정 라벨·스트레스·출처 카드와 사용자가 동의해 저장한 활동 선호만 참조하며, 일기 원문을 받지 않으므로 개별 상황 묘사의 구체성은 낮습니다.
 - 추론형 모델을 쓰고 있어 코치 문장 생성에 약 12초가 걸립니다.
 - 무료 Space는 영구 디스크가 없어 재시작 시 SQLite의 선호 기억과 과거 피드백 API 데이터가 초기화될 수 있습니다. Google Sheets 앱 평가와 브라우저의 일기·기록 그래프는 영향을 받지 않습니다.
 - 기록이 기기별로 분리됩니다. 폰과 PC의 그래프는 서로 다릅니다.

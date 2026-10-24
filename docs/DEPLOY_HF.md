@@ -1,6 +1,6 @@
 # Hugging Face Space 배포 가이드
 
-> **현재 상태 (2026-09-28): 앱 평가 기능을 포함해 배포 완료 · 동작 확인.** https://yellowmug-mindily.hf.space
+> **현재 상태 (2026-10-23): BM25 RAG·선호 기억 개인화·위기 안전 분기를 포함해 배포 완료 · 동작 확인.** https://yellowmug-mindily.hf.space
 > 코드를 고친 뒤 다시 올릴 때는 저장소 루트의 `push_to_huggingface.cmd` 를 실행하면 됩니다.
 
 기존 Render 설정은 유료 플랜(1c-2g + 2GB 디스크)을 전제로 해 막혀 있었습니다. **무료 등급으로 영구 HTTPS URL을 얻을 수 있는 Hugging Face Spaces**로 전환했습니다.
@@ -58,7 +58,7 @@ chmod +x deploy_space.sh
 
 스크립트가 하는 일:
 1. Space 저장소를 임시 폴더로 clone
-2. 배포에 필요한 파일만 복사 (`Dockerfile`, `requirements.txt`, `*.py`, `dist/`)
+2. 배포에 필요한 파일만 복사 (`Dockerfile`, `requirements.txt`, 앱에서 사용하는 `*.py`, `knowledge/`, `dist/`)
 3. `SPACE_README.md`를 Space용 `README.md`로 복사 — **Space는 YAML 프런트매터가 필요**하기 때문
 4. 커밋 후 push → Space에서 빌드 자동 시작
 
